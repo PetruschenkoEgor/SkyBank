@@ -53,7 +53,7 @@ def get_total_amount_expenses(transactions: list[dict], number_card: str | int) 
     for tr in transactions:
         # Проверяем - операция относится к данной карте, статус - ок, не входит в указанные категории и со знаком минус
         if (str(tr.get("Номер карты"))[-4:] == str(number_card)[-4:] and tr.get("Статус") == "OK"
-                and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы"]
+                and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"]
                 and float(tr.get("Сумма платежа")) < 0):
             sum_list.append(tr.get("Сумма платежа"))
 
