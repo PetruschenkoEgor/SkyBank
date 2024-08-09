@@ -76,7 +76,28 @@ def show_cashback(expenses: float) -> float:
 
 def show_transactions_top_5(transactions):
     """ Показывает топ 5 транзакций по сумме платежа """
-    pass
+    # Сортируем транзакции по тратам(от большего к меньшему)
+    sorted_trans = sorted(transactions, key=lambda x: x.get("Сумма платежа"))
+
+    # Сщздаем пустой список, куда будем накидывать топ транзакций и счетчик, для подсчета кол-ва транзакций
+    top_5 = []
+    count = 0
+    for transaction in sorted_trans:
+        # Накидываем транзакции в список, пока их не станет 5
+        if count < 5:
+            dict_trans = dict()
+            dict_trans["date"] = transaction.get("Дата платежа")
+            dict_trans["amount"] = transaction.get("Сумма платежа")
+            dict_trans["category"] = transaction.get("Категория")
+            dict_trans["description"] = transaction.get("Описание")
+            top_5.append(dict_trans)
+            count += 1
+
+    return top_5
+
+
+if __name__ == '__main__':
+    print(show_transactions_top_5(get_data_from_excel(PATH_TO_FILE_EXCEL)))
 
 
 def show_currency_rates_data():
