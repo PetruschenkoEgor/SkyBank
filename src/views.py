@@ -45,7 +45,7 @@ if __name__ == "__main__":
     print(mask_card_number("fdavrgvae"))
 
 
-def get_total_amount_expenses(transactions, number_card):
+def get_total_amount_expenses(transactions: list[dict], number_card: str | int) -> float:
     """ Общая сумма расходов """
     # Список, в который попадают все операции по карте
     sum_list = []
@@ -53,14 +53,17 @@ def get_total_amount_expenses(transactions, number_card):
         # Проверяем - операция относится к данной карте, статус - ок, не входит в указанные категории и со знаком минус
         if str(tr.get("Номер карты"))[-4:] == str(number_card)[-4:] and tr.get("Статус") == "OK" and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы"] and float(tr.get("Сумма платежа")) < 0:
             sum_list.append(tr.get("Сумма платежа"))
+
+    # Суммируем список
     sum_list = sum(sum_list)
     return -sum_list
 
 
 # if __name__ == '__main__':
-#     print(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), "**7197"))
+#     print(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), 4556))
 
-def show_cashback(expenses):
+
+def show_cashback(expenses: float) -> float:
     """ Функция считает кэшбэк(1 рубль за каждые 100 рублей) """
     # Округляем кэшбэк до двух цифр после запятой
     cashback = round(expenses * 0.01, 2)
@@ -69,6 +72,7 @@ def show_cashback(expenses):
 
 # if __name__ == '__main__':
 #     print(show_cashback(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), "**7197")))
+
 
 def show_transactions_top_5(transactions):
     """ Показывает топ 5 транзакций по сумме платежа """
@@ -95,6 +99,7 @@ def show_currency_rates_data():
 
 # if __name__ == '__main__':
 #     print(show_currency_rates_data())
+
 
 def show_stock_prices_data_sp500():
     """ Показывает стоимость акций из S&P 500 """
