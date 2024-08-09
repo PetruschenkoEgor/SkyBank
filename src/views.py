@@ -1,6 +1,6 @@
 import datetime
 import requests
-from get_data import get_data_from_excel, PATH_TO_FILE_EXCEL
+from src.get_data import get_data_from_excel, PATH_TO_FILE_EXCEL
 
 
 def say_hello():
@@ -32,7 +32,7 @@ def mask_card_number(number_card):
     number_card_str = str(number_card)
 
     # Проверяем корректность введенного номера карты
-    if len(number_card_str) != 16 or not number_card_str.isdigit():
+    if len(number_card_str) < 4 or not number_card_str[-4:].isdigit():
         result = "Некорректный номер карты!"
     else:
         # Делаем маску номера, заменяем часть строки подстрокой
@@ -42,7 +42,7 @@ def mask_card_number(number_card):
 
 
 if __name__ == "__main__":
-    print(mask_card_number(7000792289606361))
+    print(mask_card_number("fdavrgvae"))
 
 
 def get_total_amount_expenses(transactions, number_card):
@@ -93,8 +93,8 @@ def show_currency_rates_data():
     return result
 
 
-if __name__ == '__main__':
-    print(show_currency_rates_data())
+# if __name__ == '__main__':
+#     print(show_currency_rates_data())
 
 def show_stock_prices_data_sp500():
     """ Показывает стоимость акций из S&P 500 """
