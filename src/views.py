@@ -27,7 +27,8 @@ def say_hello():
 if __name__ == '__main__':
     print(say_hello())
 
-def mask_card_number(number_card):
+
+def mask_card_number(number_card: str | int) -> str:
     """ Маскирует номер карты(показывает 4 последние цифры) """
     number_card_str = str(number_card)
 
@@ -51,7 +52,9 @@ def get_total_amount_expenses(transactions: list[dict], number_card: str | int) 
     sum_list = []
     for tr in transactions:
         # Проверяем - операция относится к данной карте, статус - ок, не входит в указанные категории и со знаком минус
-        if str(tr.get("Номер карты"))[-4:] == str(number_card)[-4:] and tr.get("Статус") == "OK" and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы"] and float(tr.get("Сумма платежа")) < 0:
+        if (str(tr.get("Номер карты"))[-4:] == str(number_card)[-4:] and tr.get("Статус") == "OK"
+                and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы"]
+                and float(tr.get("Сумма платежа")) < 0):
             sum_list.append(tr.get("Сумма платежа"))
 
     # Суммируем список
@@ -74,7 +77,7 @@ def show_cashback(expenses: float) -> float:
 #     print(show_cashback(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), "**7197")))
 
 
-def show_transactions_top_5(transactions):
+def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
     """ Показывает топ 5 транзакций по сумме платежа """
     # Сортируем транзакции по тратам(от большего к меньшему)
     sorted_trans = sorted(transactions, key=lambda x: x.get("Сумма платежа"))
@@ -96,8 +99,8 @@ def show_transactions_top_5(transactions):
     return top_5
 
 
-if __name__ == '__main__':
-    print(show_transactions_top_5(get_data_from_excel(PATH_TO_FILE_EXCEL)))
+# if __name__ == '__main__':
+#     print(show_transactions_top_5(get_data_from_excel(PATH_TO_FILE_EXCEL)))
 
 
 def show_currency_rates_data():
