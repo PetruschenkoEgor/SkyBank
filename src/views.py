@@ -1,4 +1,5 @@
 import datetime
+import requests
 from get_data import get_data_from_excel, PATH_TO_FILE_EXCEL
 
 
@@ -68,3 +69,33 @@ def show_cashback(expenses):
 
 # if __name__ == '__main__':
 #     print(show_cashback(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), "**7197")))
+
+def show_transactions_top_5(transactions):
+    """ Показывает топ 5 транзакций по сумме платежа """
+    pass
+
+
+def show_currency_rates_data():
+    """ Показывает курс валют """
+    url = "https://api.apilayer.com/exchangerates_data/latest"
+    headers = {"apikey": "4kvX6s69BemzZNZ2DWO17p0PAMcl01Tr"}
+    payload = {
+        "symbols": ["USD", "EUR"],
+        "base": "RUB"
+    }
+
+    response = requests.get(url, headers=headers, params=payload)
+
+    status_code = response.status_code
+
+    result = response.json()
+
+    return result
+
+
+if __name__ == '__main__':
+    print(show_currency_rates_data())
+
+def show_stock_prices_data_sp500():
+    """ Показывает стоимость акций из S&P 500 """
+    pass
