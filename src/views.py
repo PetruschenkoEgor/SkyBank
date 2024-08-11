@@ -5,6 +5,7 @@ import os
 from src.utils import get_data_from_excel, PATH_TO_FILE_EXCEL
 
 
+# Файл, в который сохраняются логи
 PATH_TO_FILE_FILE_HANDLER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", "views.log")
 
 logger = logging.getLogger("views")
@@ -17,9 +18,11 @@ logger.addHandler(file_handler)
 
 def say_hello():
     """ Функция принимает строку со временем и здоровается в зависимости от времени суток """
+    logger.info("Получаем текущее время")
     # Текущее время
     current_time = str(datetime.datetime.now())[11:16]
 
+    logger.info("Получаем часы и переводим их в число")
     # Получаем часы и переводим их в число
     time = int(current_time[:2])
 

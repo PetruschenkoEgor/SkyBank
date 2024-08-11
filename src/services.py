@@ -1,5 +1,18 @@
 import datetime
+import logging
+import os
 from src.utils import get_data_from_excel, PATH_TO_FILE_EXCEL
+
+
+# Файл, в который сохраняются логи
+PATH_TO_FILE_FILE_HANDLER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", "services.log")
+
+logger = logging.getLogger("services")
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler(PATH_TO_FILE_FILE_HANDLER, "w")
+file_formatter = logging.Formatter("%(asctime)s - %(filename)s - %(levelname)s: %(message)s")
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
 
 
 def transactions_for_investment_bank(transactions: list[dict]) -> list[dict]:
@@ -9,6 +22,7 @@ def transactions_for_investment_bank(transactions: list[dict]) -> list[dict]:
 
     # Проходимся по транзакциям и добавляем нужные нам данные в словарь, словари добавляем в список
     for trans in transactions:
+        logger.info("Проверка транзакции(успешный статус, нужные категории и операция со знаком минус)")
         # Проверяем, что бы транзакция была действительно успешной тратой
         if trans.get("Статус") == "OK" and trans.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"] and float(trans.get("Сумма платежа")) < 0:
             dict_trans = dict()
@@ -37,14 +51,17 @@ def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) 
     deferred_amount = []
 
     for trans in transactions:
+        logger.info("Получение траты и ее округление")
         digit_ = str(round(trans.get("amount"), 1))
 
+        logger.info("Выборка транзакции с нужным месяцем")
         # Выбираем транзакции с нужным месяцем
         if month == trans.get("date")[:7]:
 
             # Выбираем до скольки округлить сумму согласно лимиту
             if limit == 10 and trans.get("amount") != 0.0:
                 digit = float(digit_[-3:])
+                logger.info("Получение суммы для копилки(округление до 10)")
                 # Сумма, которую можно отложить в инвест-копилку
                 rounding = 10 - abs(digit)
                 deferred_amount.append(rounding)
@@ -53,15 +70,18 @@ def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) 
                 digit = float(digit_[-4:])
 
                 if digit >= 50:
+                    logger.info("Получение суммы для копилки(округление до 50)")
                     rounding = 100 - abs(digit)
                     deferred_amount.append(rounding)
 
                 else:
+                    logger.info("Получение суммы для копилки(округление до 50)")
                     rounding = 50 - abs(digit)
                     deferred_amount.append(rounding)
 
             elif limit == 100 and trans.get("amount") != 0.0:
                 digit = float(digit_[-4:])
+                logger.info("Получение суммы для копилки(округление до 100)")
                 rounding = 100 - abs(digit)
                 deferred_amount.append(rounding)
 
