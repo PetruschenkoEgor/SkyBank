@@ -105,47 +105,37 @@ def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
 
 def show_currency_rates_data():
     """ Показывает курс валют """
-    url = "https://api.apilayer.com/exchangerates_data/latest"
-    headers = {"apikey": "4kvX6s69BemzZNZ2DWO17p0PAMcl01Tr"}
-
-    # Получение курса USD
-    payload = {
-        "symbols": "RUB",
-        "base": "USD"
-    }
-    # response_usd = requests.get(url, headers=headers, params=payload)
-    # status_code = response_usd.status_code
-    # result_u = response_usd.json().get("rates")
-    # result_usd = round(result_u.get("RUB"), 2)
-
-    # Получение курса EUR
-    payload = {
-        "symbols": "RUB",
-        "base": "EUR"
-    }
-    # response_usd = requests.get(url, headers=headers, params=payload)
-    # status_code = response_usd.status_code
-    # result_e = response_usd.json().get("rates")
-    # result_eur = round(result_e.get("RUB"), 2)
-
     # Список словарей с курсом валют usd, eur
     currency_list = []
 
-    # Создаем пустые словари для курса валют
-    dict_usd = dict()
-    dict_eur = dict()
+    # Сисок валют
+    ticker_list = ["USD", "EUR"]
 
-    # Добавляем в словарь курс доллара
-    dict_usd["currency"] = "USD"
-    dict_usd["rate"] = result_usd
-    # Добавляем словарь в список
-    currency_list.append(dict_usd)
+    url = "https://api.apilayer.com/exchangerates_data/latest"
+    headers = {"apikey": "4kvX6s69BemzZNZ2DWO17p0PAMcl01Tr"}
 
-    #Добавляем в словарь курс евро
-    dict_eur["currency"] = "EUR"
-    dict_eur["rate"] = result_eur
-    # Добавляем словарь в список
-    currency_list.append(dict_eur)
+    for ticker in ticker_list:
+        # Получение курса USD
+        payload = {
+            "symbols": "RUB",
+            "base": {ticker}
+        }
+        response = requests.get(url, headers=headers, params=payload)
+        # Получаем статус запроса
+        status_code = response.status_code
+
+        if status_code == 200:
+            result = response.json().get("rates")
+            result = round(result.get("RUB"), 2)
+
+            # Создаем пустой словарь для курса валют и добавляем в него данные
+            dict_currency = dict()
+            dict_currency["currency"] = {ticker}
+            dict_currency["rate"] = result
+            # Добавляем словарь в список
+            currency_list.append(dict_currency)
+        else:
+            return f"Произошла ошибка! Статус-код: {status_code}"
 
     return currency_list
 
@@ -156,11 +146,42 @@ def show_currency_rates_data():
 
 def show_stock_prices_data_sp500():
     """ Показывает стоимость акций из S&P 500 """
-    url = "https://financialmodelingprep.com/api/v4/search/isin?isin=US0378331005&apikey=TKkLZFI8RhNVVQ8DUCBNiqRcvjcHkC4z"
-    headers = {"apikey": "TKkLZFI8RhNVVQ8DUCBNiqRcvjcHkC4z"}
-    response_usd = requests.get("https://financialmodelingprep.com/api/v4/search/isin?isin=US0378331005&apikey=TKkLZFI8RhNVVQ8DUCBNiqRcvjcHkC4z")
-    result = response_usd.json()
-    return result
+    # Создаем пустой список для словарей с ценами на акции
+    prices = []
+
+    # Список тикеров нужных нам акций
+    tickers_list = ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA"]
+    # ApiKey
+    apikey = "2UXI18TGUOONWY3N1"
+    # Подставляем каждый тикер в get-запрос
+    for ticker in tickers_list:
+        url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={apikey}"
+        response = requests.get(url)
+        # Получаем статус запроса
+        status_code = response.status_code
+
+        if status_code == 200:
+            # Получаем эту строку, если API запросы закончились
+            info = "Thank you for using Alpha Vantage! Our standard API rate limit is 25 requests per day."
+            # Проверяем, что API запросы у нас не закончились
+            if info not in response.json().get("Information"):
+                # Получаем нужные нам значения из полученных данных
+                result = response.json().get("Global Quote")
+
+                # Создаем пустой словарь и добавляем в него данные
+                price_dict = dict()
+                price_dict["stock"] = ticker
+                price_dict["price"] = round(float(result.get("05. price")), 2)
+                # Добавляем словарь в список
+                prices.append(price_dict)
+            # Сообщение о том, что API запросы закончились
+            else:
+                return "Запросы на сегодня закончились! Приходите завтра! В день разрешено 25 запросов!"
+        # Произошла ошибка
+        else:
+            return f"Произошла ошибка! Статус-код: {status_code}"
+
+    return prices
 
 
 if __name__ == '__main__':
