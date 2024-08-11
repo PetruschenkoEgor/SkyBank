@@ -12,12 +12,6 @@ def get_data_from_excel(path_to_file):
         # Считываем Excel-файл
         transactions_excel = pd.read_excel(path_to_file)
 
-        # Убираем значения NaN
-        # transactions_excel_not_nan_number_card = transactions_excel.loc[transactions_excel["Номер карты"].notnull()]
-
-        # Преобразуем числа с плавающей точкой в int64
-        # transactions_excel_not_nan = transactions_excel.astype({"Кэшбэк": "int64", "MCC": "int64"})
-
         # Преобразуем полученные данные в список словарей
         transactions_list_dicts = transactions_excel.to_dict(orient="records")
 
@@ -41,5 +35,5 @@ def get_data_from_excel_df(path_to_file):
         return []
 
 
-if __name__ == '__main__':
-    print(get_data_from_excel_df(PATH_TO_FILE_EXCEL))
+# if __name__ == '__main__':
+#     print(get_data_from_excel_df(PATH_TO_FILE_EXCEL))

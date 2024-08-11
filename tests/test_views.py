@@ -1,12 +1,12 @@
 import pytest
 from unittest.mock import patch
 
-from src.views import say_hello, mask_card_number, get_total_amount_expenses, show_cashback, show_transactions_top_5
+from src.views import say_hello, mask_card_number, get_total_amount_expenses, show_cashback, show_transactions_top_5, show_currency_rates_data
 
 
-# @patch('src.views.say_hello')
+# @patch('src.views.datetime.datetime.now()')
 # def test_say_hello_day(mock_time):
-#     mock_time.return_value = 13
+#     mock_time.return_value = "2024-08-11 13:46:36.427969"
 #     assert say_hello() == "Добрый день"
 
 
@@ -91,3 +91,18 @@ def test_show_transactions_top_5_2(trans_2):
     assert show_transactions_top_5(trans_2) == [{'date': '04.01.2018', 'amount': -316.0, 'category': 'Красота', 'description': 'OOO Balid'}, {'date': '05.01.2018', 'amount': -21.0, 'category': 'Красота', 'description': 'OOO Balid'}]
 
 
+# @patch("src.views.response")
+# def test_show_currency_rates_data(mock_get):
+#     """ Тест курса валют """
+#     mock_get.return_value.status_code = 200
+#     mock_get.return_value.json.return_value = {'success': True, 'timestamp': 1723358944, 'base': 'USD', 'date': '2024-08-11', 'rates': {'RUB': 86.80366}}
+#     result = show_currency_rates_data()
+#     assert result == [{'currency': {'USD'}, 'rate': 86.8}]
+
+
+
+
+
+# {'success': True, 'timestamp': 1723358944, 'base': 'USD', 'date': '2024-08-11', 'rates': {'RUB': 86.80366}}
+# {'success': True, 'timestamp': 1723358824, 'base': 'EUR', 'date': '2024-08-11', 'rates': {'RUB': 94.810355}}
+# [{'currency': {'USD'}, 'rate': 86.8}, {'currency': {'EUR'}, 'rate': 94.81}]
