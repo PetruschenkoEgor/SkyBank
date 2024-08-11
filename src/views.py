@@ -1,6 +1,6 @@
 import datetime
 import requests
-from src.get_data import get_data_from_excel, PATH_TO_FILE_EXCEL
+from src.utils import get_data_from_excel, PATH_TO_FILE_EXCEL
 
 
 def say_hello():
@@ -24,8 +24,8 @@ def say_hello():
     return hello
 
 
-if __name__ == '__main__':
-    print(say_hello())
+# if __name__ == '__main__':
+#     print(say_hello())
 
 
 def mask_card_number(number_card: str | int) -> str:
@@ -42,8 +42,8 @@ def mask_card_number(number_card: str | int) -> str:
     return result
 
 
-if __name__ == "__main__":
-    print(mask_card_number("fdavrgvae"))
+# if __name__ == "__main__":
+#     print(mask_card_number("fdavrgvae"))
 
 
 def get_total_amount_expenses(transactions: list[dict], number_card: str | int) -> float:
@@ -107,18 +107,47 @@ def show_currency_rates_data():
     """ Показывает курс валют """
     url = "https://api.apilayer.com/exchangerates_data/latest"
     headers = {"apikey": "4kvX6s69BemzZNZ2DWO17p0PAMcl01Tr"}
+
+    # Получение курса USD
     payload = {
-        "symbols": ["USD", "EUR"],
-        "base": "RUB"
+        "symbols": "RUB",
+        "base": "USD"
     }
+    # response_usd = requests.get(url, headers=headers, params=payload)
+    # status_code = response_usd.status_code
+    # result_u = response_usd.json().get("rates")
+    # result_usd = round(result_u.get("RUB"), 2)
 
-    response = requests.get(url, headers=headers, params=payload)
+    # Получение курса EUR
+    payload = {
+        "symbols": "RUB",
+        "base": "EUR"
+    }
+    # response_usd = requests.get(url, headers=headers, params=payload)
+    # status_code = response_usd.status_code
+    # result_e = response_usd.json().get("rates")
+    # result_eur = round(result_e.get("RUB"), 2)
 
-    status_code = response.status_code
+    # Список словарей с курсом валют usd, eur
+    currency_list = []
 
-    result = response.json()
+    # Создаем пустые словари для курса валют
+    dict_usd = dict()
+    dict_eur = dict()
 
-    return result
+    # Добавляем в словарь курс доллара
+    dict_usd["currency"] = "USD"
+    dict_usd["rate"] = result_usd
+    # Добавляем словарь в список
+    currency_list.append(dict_usd)
+
+    #Добавляем в словарь курс евро
+    dict_eur["currency"] = "EUR"
+    dict_eur["rate"] = result_eur
+    # Добавляем словарь в список
+    currency_list.append(dict_eur)
+
+    return currency_list
 
 
 # if __name__ == '__main__':
@@ -127,4 +156,12 @@ def show_currency_rates_data():
 
 def show_stock_prices_data_sp500():
     """ Показывает стоимость акций из S&P 500 """
-    pass
+    url = "https://financialmodelingprep.com/api/v4/search/isin?isin=US0378331005&apikey=TKkLZFI8RhNVVQ8DUCBNiqRcvjcHkC4z"
+    headers = {"apikey": "TKkLZFI8RhNVVQ8DUCBNiqRcvjcHkC4z"}
+    response_usd = requests.get("https://financialmodelingprep.com/api/v4/search/isin?isin=US0378331005&apikey=TKkLZFI8RhNVVQ8DUCBNiqRcvjcHkC4z")
+    result = response_usd.json()
+    return result
+
+
+if __name__ == '__main__':
+    print(show_stock_prices_data_sp500())

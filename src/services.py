@@ -1,5 +1,5 @@
 import datetime
-from src.get_data import get_data_from_excel, PATH_TO_FILE_EXCEL
+from src.utils import get_data_from_excel, PATH_TO_FILE_EXCEL
 
 
 def transactions_for_investment_bank(transactions: list[dict]) -> list[dict]:

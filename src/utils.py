@@ -26,5 +26,20 @@ def get_data_from_excel(path_to_file):
         return []
 
 
-if __name__ == "__main__":
-    print(get_data_from_excel(PATH_TO_FILE_EXCEL))
+# if __name__ == "__main__":
+#     print(get_data_from_excel(PATH_TO_FILE_EXCEL))
+
+
+def get_data_from_excel_df(path_to_file):
+    """ Функция получает путь к файлу и возвращает DataFrame """
+    try:
+        # Считываем Excel-файл
+        transactions_excel = pd.read_excel(path_to_file)
+
+        return transactions_excel
+    except FileNotFoundError:
+        return []
+
+
+if __name__ == '__main__':
+    print(get_data_from_excel_df(PATH_TO_FILE_EXCEL))
