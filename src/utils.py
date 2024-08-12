@@ -17,7 +17,7 @@ PATH_TO_FILE_EXCEL = os.path.join(os.path.dirname(os.path.dirname(__file__)), "d
 # Файл, в который сохраняются логи
 PATH_TO_FILE_FILE_HANDLER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", "utils.log")
 
-#
+# Файл с пользовательскими настройками
 USERS_SETTINGS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "users_settings.json")
 
 logger = logging.getLogger("utils")
@@ -127,14 +127,28 @@ def mask_card_number(transactions):
 #     print(mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL)))
 
 
+def show_cashback(expenses: float) -> float:
+    """ Функция считает кэшбэк(1 рубль за каждые 100 рублей) """
+    logger.info("Рассчет и округление кэшбэка")
+    # Рассчитываем кэшбэк и округляем до двух цифр после запятой
+    cashback = round(expenses * 0.01, 2)
+    return cashback
+
+
+# if __name__ == '__main__':
+#     print(show_cashback(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), "**7197")))
+
+
 def get_total_amount_expenses(transactions, number_card):
     """ Общая сумма расходов """
+    number_card_ = number_card
     # Список для словарей с готовыми данными
     amount_list = []
 
-    for number in number_card:
+    for number in number_card_:
         # Список, в который попадают все операции по определенной карте
         sum_list = []
+
         # Инициализация словаря
         dict_amount = dict()
         # Добавление номера карты в словарь
@@ -148,27 +162,23 @@ def get_total_amount_expenses(transactions, number_card):
                     and float(tr.get("Сумма платежа")) < 0):
                 logger.info("Добавление в список суммы платежа")
                 sum_list.append(tr.get("Сумма платежа"))
+
         logger.info("Рассчет суммы расходов по определенной карте и добавление в словарь")
         # Добавление в словарь трат по определенной карте
         dict_amount["total_spent"] = -sum(sum_list)
 
+        # Общие траты по определенной карте
+        total_spent = dict_amount.get("total_spent")
+        # Вызываем функцию расчета кэшбэка
+        cash_back = show_cashback(total_spent)
+
+        dict_amount["cashback"] = cash_back
+
     return amount_list
 
 
-if __name__ == '__main__':
-    print(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
-
-
-def show_cashback(expenses: float) -> float:
-    """ Функция считает кэшбэк(1 рубль за каждые 100 рублей) """
-    logger.info("Рассчет и округление кэшбэка")
-    # Рассчитываем кэшбэк и округляем до двух цифр после запятой
-    cashback = round(expenses * 0.01, 2)
-    return cashback
-
-
 # if __name__ == '__main__':
-#     print(show_cashback(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), "**7197")))
+#     print(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
 
 
 def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
@@ -209,7 +219,7 @@ def show_currency_rates_data(file=USERS_SETTINGS):
     with open(file) as f:
         data = json.load(f)
 
-    url = "https://api.apilayer.com/exchangerates_data/latest"
+    # url = "https://api.apilayer.com/exchangerates_data/latest"
     # Получение значения переменной API_KEY из .env-файла
     headers = os.getenv("API_KEY_CURRENCY_RATES")
 
@@ -252,7 +262,7 @@ def show_currency_rates_data(file=USERS_SETTINGS):
 #     print(show_currency_rates_data())
 
 
-def show_stock_prices_data_sp500(file):
+def show_stock_prices_data_sp500(file=USERS_SETTINGS):
     """ Показывает стоимость акций из S&P 500 """
     # Создаем пустой список для словарей с ценами на акции
     prices = []
@@ -268,7 +278,7 @@ def show_stock_prices_data_sp500(file):
     try:
         # Подставляем каждый тикер в get-запрос
         for ticker in data.get("user_stocks"):
-            url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={apikey}"
+            # url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={apikey}"
             logger.info("Выполнение get-запроса на получение цен на акции")
             response = requests.get(url)
             logger.info("Получение статус-кода на получение цен на акции")
@@ -308,13 +318,3 @@ def show_stock_prices_data_sp500(file):
 
 # if __name__ == '__main__':
 #     print(show_stock_prices_data_sp500())
-
-
-def func(tr):
-    # spending_category = tr.loc[tr["Номер карты"] == "*7197"]
-    spending_category = tr.loc[tr['Сумма платежа'] < 0, 'Сумма платежа'].sum()
-    return spending_category
-
-
-# if __name__ == '__main__':
-#     print(func(get_data_from_excel_df(PATH_TO_FILE_EXCEL)))
