@@ -67,4 +67,3 @@ pip install -r requirements.txt
 
 ## Лицензия:
 Проект распространяется под лицензией SkyPro.
-

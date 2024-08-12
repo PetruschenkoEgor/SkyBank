@@ -129,43 +129,34 @@ def mask_card_number(transactions):
 
 def get_total_amount_expenses(transactions, number_card):
     """ Общая сумма расходов """
-    sum_list = []
+    # Список для словарей с готовыми данными
     amount_list = []
 
     for number in number_card:
-        # Список, в который попадают все операции по карте
-        # sum_list = []
+        # Список, в который попадают все операции по определенной карте
+        sum_list = []
+        # Инициализация словаря
         dict_amount = dict()
+        # Добавление номера карты в словарь
         dict_amount["last_digits"] = number[-4:]
-        # dict_amount["total_spent"] = sum(sum_list)
 
         amount_list.append(dict_amount)
         for tr in transactions:
-            # dict_amount["total_spent"] = sum(sum_list)
             # Проверяем - операция относится к данной карте, статус - ок, не входит в указанные категории и со знаком минус
             if (str(tr.get("Номер карты")) == number and tr.get("Статус") == "OK"
                     and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"]
                     and float(tr.get("Сумма платежа")) < 0):
                 logger.info("Добавление в список суммы платежа")
                 sum_list.append(tr.get("Сумма платежа"))
-            dict_amount["total_spent"] = -sum(sum_list)
-        logger.info("Рассчет суммы расходов")
+        logger.info("Рассчет суммы расходов по определенной карте и добавление в словарь")
+        # Добавление в словарь трат по определенной карте
+        dict_amount["total_spent"] = -sum(sum_list)
 
-        # Суммируем список
-        # sum_list = sum(sum_list)
     return amount_list
 
-    # for number in number_card:
-    #     # Список для подсчета расходов по одной карте
-    #     amount_list = []
-    #     amount = transactions.loc[(str(transactions["Номер карты"]) == number) and (str(transactions["Статус"]) == "OK") and (str(transactions["Категория"]) not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"]) and (transactions["Сумма платежа"] < 0)]
-    #     # Добавляем трату в список
-    #     amount_list.append(amount)
-    #     return amount_list
 
-
-# if __name__ == '__main__':
-#     print(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
+if __name__ == '__main__':
+    print(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
 
 
 def show_cashback(expenses: float) -> float:
@@ -325,5 +316,5 @@ def func(tr):
     return spending_category
 
 
-if __name__ == '__main__':
-    print(func(get_data_from_excel_df(PATH_TO_FILE_EXCEL)))
+# if __name__ == '__main__':
+#     print(func(get_data_from_excel_df(PATH_TO_FILE_EXCEL)))
