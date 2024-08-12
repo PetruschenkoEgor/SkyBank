@@ -2,11 +2,15 @@ import pandas as pd
 import datetime
 import logging
 import os
+from functools import wraps
 from src.utils import get_data_from_excel_df, PATH_TO_FILE_EXCEL
 
 
 # Самая свежая дата в таблице
-today = "31.12.2021 16:44:00"
+TOODAY = "31.12.2021 16:44:00"
+
+# Файл, в который будет сохраняться отчет по тратам по категориям
+PATH_TO_WRITE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "reports_file", "spending_by_category.txt")
 
 # Файл, в который сохраняются логи
 PATH_TO_FILE_FILE_HANDLER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", "reports.log")
@@ -19,7 +23,26 @@ file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
 
 
-def spending_by_category(transactions, category, date=today):
+def write_to_path(path=PATH_TO_WRITE):
+    """ Декоратор, запись в файл """
+    def wrapper(function):
+        @wraps(function)
+        def inner(*args, **kwargs):
+            logger.info("Вызов функции внутри декоратора")
+            result = function(*args, **kwargs)
+            logger.info("Запись в файл")
+            # Запись в файл
+            with open(path, 'w', encoding='utf-8') as file:
+                # file.write(result.to_string(header=False, index=False))
+                # Записывает построчно датафрейм в файл
+                result.to_string(file)
+            return result
+        return inner
+    return wrapper
+
+
+@write_to_path()
+def spending_by_category(transactions, category, date=TOODAY):
     logger.info("Определение конечного значения даты")
     # Конечное значение(до какой даты происходит поиск)
     end = datetime.datetime.strptime(date, "%d.%m.%Y %H:%M:%S")
@@ -33,11 +56,11 @@ def spending_by_category(transactions, category, date=today):
     logger.info("Выборка нужных строк по фильтру")
     # Делаем выборку нужных нам строк(чтобы дата была в нужном промежутке и была нужная категория)
     spending_category = transactions.loc[(transactions["date"] <= end) & (transactions["date"] >= start) & (transactions["Категория"] == category)]
-    logger.info("Суммирование полученных значений")
+    # logger.info("Суммирование полученных значений")
     # Суммируем полученные значения
-    sum_spending_category = abs(spending_category["Сумма платежа"]).sum(axis=0)
+    # sum_spending_category = abs(spending_category["Сумма платежа"]).sum(axis=0)
 
-    return sum_spending_category
+    return spending_category
 
 
 if __name__ == '__main__':
