@@ -46,7 +46,7 @@ def transactions_for_investment_bank(transactions: list[dict]) -> list[dict]:
 #     print(transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)))
 
 
-def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) -> float:
+def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) -> str:
     """ Копилка, возвращает сумму, которую округлили до 10, 50 или 100 рублей и откладывают в инвесткопилку """
     # Возможная отложенная сумма
     deferred_amount = []
@@ -92,12 +92,7 @@ def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) 
     deferred_amount_result["month"] = month
     deferred_amount_result["investamount"] = sum(deferred_amount)
 
-    logger.info("Перевод ответа в json")
-    # Переводим словарь в json
-    invest_amount = json.dumps(deferred_amount_result)
-
-
-    return invest_amount
+    return json.dumps(deferred_amount_result)
 
 
 if __name__ == '__main__':
