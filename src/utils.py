@@ -1,4 +1,6 @@
 import datetime
+import json
+
 import requests
 import os
 import logging
@@ -14,6 +16,9 @@ PATH_TO_FILE_EXCEL = os.path.join(os.path.dirname(os.path.dirname(__file__)), "d
 
 # Файл, в который сохраняются логи
 PATH_TO_FILE_FILE_HANDLER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", "utils.log")
+
+#
+USERS_SETTINGS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "users_settings.json")
 
 logger = logging.getLogger("utils")
 logger.setLevel(logging.INFO)
@@ -40,8 +45,8 @@ def get_data_from_excel(path_to_file):
         return []
 
 
-if __name__ == "__main__":
-    print(get_data_from_excel(PATH_TO_FILE_EXCEL))
+# if __name__ == "__main__":
+#     print(get_data_from_excel(PATH_TO_FILE_EXCEL))
 
 
 def get_data_from_excel_df(path_to_file):
@@ -92,46 +97,75 @@ def say_hello():
 #     print(say_hello())
 
 
-def mask_card_number(number_card: str | int) -> str:
+def mask_card_number(transactions):
     """ Маскирует номер карты(показывает 4 последние цифры) """
-    number_card_str = str(number_card)
+    # number_card_str = str(number_card)
+    #
+    # # Проверяем корректность введенного номера карты
+    # if len(number_card_str) < 4 or not number_card_str[-4:].isdigit():
+    #     logger.error("Введен некорректный номер карты")
+    #     result = "Некорректный номер карты!"
+    # else:
+    #     logger.info("Создание маски номера карты")
+    #     # Делаем маску номера, заменяем часть строки подстрокой
+    #     result = number_card_str[-4:]
+    #
+    # return result
 
-    # Проверяем корректность введенного номера карты
-    if len(number_card_str) < 4 or not number_card_str[-4:].isdigit():
-        logger.error("Введен некорректный номер карты")
-        result = "Некорректный номер карты!"
-    else:
-        logger.info("Создание маски номера карты")
-        # Делаем маску номера, заменяем часть строки подстрокой
-        result = number_card_str[-4:]
+    logger.info("Удаление значений nan")
+    # Убираем значения nan из столбца "Номер карты"
+    transactions_not_nan = transactions.loc[transactions["Номер карты"].notnull()]
 
-    return result
+    logger.info("Получение список уникальных номеров карт")
+    # Получаем список уникальных номеров карт
+    number_card = transactions_not_nan.loc[:, "Номер карты"].unique()
+
+    return number_card
 
 
 # if __name__ == "__main__":
-#     print(mask_card_number("fdavrgvae"))
+#     print(mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL)))
 
 
-def get_total_amount_expenses(transactions: list[dict], number_card: str | int) -> float:
+def get_total_amount_expenses(transactions, number_card):
     """ Общая сумма расходов """
-    # Список, в который попадают все операции по карте
     sum_list = []
-    for tr in transactions:
-        # Проверяем - операция относится к данной карте, статус - ок, не входит в указанные категории и со знаком минус
-        if (str(tr.get("Номер карты"))[-4:] == str(number_card)[-4:] and tr.get("Статус") == "OK"
-                and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"]
-                and float(tr.get("Сумма платежа")) < 0):
-            logger.info("Добавление в список суммы платежа")
-            sum_list.append(tr.get("Сумма платежа"))
+    amount_list = []
 
-    logger.info("Рассчет суммы расходов")
-    # Суммируем список
-    sum_list = sum(sum_list)
-    return -sum_list
+    for number in number_card:
+        # Список, в который попадают все операции по карте
+        # sum_list = []
+        dict_amount = dict()
+        dict_amount["last_digits"] = number[-4:]
+        # dict_amount["total_spent"] = sum(sum_list)
+
+        amount_list.append(dict_amount)
+        for tr in transactions:
+            # dict_amount["total_spent"] = sum(sum_list)
+            # Проверяем - операция относится к данной карте, статус - ок, не входит в указанные категории и со знаком минус
+            if (str(tr.get("Номер карты")) == number and tr.get("Статус") == "OK"
+                    and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"]
+                    and float(tr.get("Сумма платежа")) < 0):
+                logger.info("Добавление в список суммы платежа")
+                sum_list.append(tr.get("Сумма платежа"))
+            dict_amount["total_spent"] = -sum(sum_list)
+        logger.info("Рассчет суммы расходов")
+
+        # Суммируем список
+        # sum_list = sum(sum_list)
+    return amount_list
+
+    # for number in number_card:
+    #     # Список для подсчета расходов по одной карте
+    #     amount_list = []
+    #     amount = transactions.loc[(str(transactions["Номер карты"]) == number) and (str(transactions["Статус"]) == "OK") and (str(transactions["Категория"]) not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"]) and (transactions["Сумма платежа"] < 0)]
+    #     # Добавляем трату в список
+    #     amount_list.append(amount)
+    #     return amount_list
 
 
 # if __name__ == '__main__':
-#     print(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), 4556))
+#     print(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
 
 
 def show_cashback(expenses: float) -> float:
@@ -174,20 +208,22 @@ def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
 #     print(show_transactions_top_5(get_data_from_excel(PATH_TO_FILE_EXCEL)))
 
 
-def show_currency_rates_data():
+def show_currency_rates_data(file=USERS_SETTINGS):
     """ Показывает курс валют """
     # Список словарей с курсом валют usd, eur
     currency_list = []
 
-    # Сисок валют
-    ticker_list = ["USD", "EUR"]
+    logger.info("Открытие файла с пользовательскими настройками")
+    # Открываем json-файл с пользовательскими настройками
+    with open(file) as f:
+        data = json.load(f)
 
     url = "https://api.apilayer.com/exchangerates_data/latest"
     # Получение значения переменной API_KEY из .env-файла
     headers = os.getenv("API_KEY_CURRENCY_RATES")
 
     try:
-        for ticker in ticker_list:
+        for ticker in data.get("user_currencies"):
             # Получение курса USD
             payload = {
                 "symbols": "RUB",
@@ -225,19 +261,22 @@ def show_currency_rates_data():
 #     print(show_currency_rates_data())
 
 
-def show_stock_prices_data_sp500():
+def show_stock_prices_data_sp500(file):
     """ Показывает стоимость акций из S&P 500 """
     # Создаем пустой список для словарей с ценами на акции
     prices = []
 
-    # Список тикеров нужных нам акций
-    tickers_list = ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA"]
+    logger.info("Открытие файла с пользовательскими настройками")
+    # Открываем json-файл с пользовательскими настройками
+    with open(file) as f:
+        data = json.load(f)
+
     # Получение значения переменной API_KEY из .env-файла
     apikey = os.getenv("API_KEY_STOCK_PRICE")
 
     try:
         # Подставляем каждый тикер в get-запрос
-        for ticker in tickers_list:
+        for ticker in data.get("user_stocks"):
             url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={apikey}"
             logger.info("Выполнение get-запроса на получение цен на акции")
             response = requests.get(url)
@@ -278,3 +317,13 @@ def show_stock_prices_data_sp500():
 
 # if __name__ == '__main__':
 #     print(show_stock_prices_data_sp500())
+
+
+def func(tr):
+    # spending_category = tr.loc[tr["Номер карты"] == "*7197"]
+    spending_category = tr.loc[tr['Сумма платежа'] < 0, 'Сумма платежа'].sum()
+    return spending_category
+
+
+if __name__ == '__main__':
+    print(func(get_data_from_excel_df(PATH_TO_FILE_EXCEL)))

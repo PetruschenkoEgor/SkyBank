@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import os
 from src.utils import get_data_from_excel, PATH_TO_FILE_EXCEL
@@ -41,8 +42,8 @@ def transactions_for_investment_bank(transactions: list[dict]) -> list[dict]:
     return result_list
 
 
-if __name__ == '__main__':
-    print(transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)))
+# if __name__ == '__main__':
+#     print(transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)))
 
 
 def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) -> float:
@@ -85,8 +86,19 @@ def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) 
                 rounding = 100 - abs(digit)
                 deferred_amount.append(rounding)
 
-    return sum(deferred_amount)
+    logger.info("Добавление в словарь данных")
+    # Добавляем в словарь нужные данные
+    deferred_amount_result = dict()
+    deferred_amount_result["month"] = month
+    deferred_amount_result["investamount"] = sum(deferred_amount)
+
+    logger.info("Перевод ответа в json")
+    # Переводим словарь в json
+    invest_amount = json.dumps(deferred_amount_result)
 
 
-# if __name__ == '__main__':
-#     print(investment_bank("2018-01", transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)), 100))
+    return invest_amount
+
+
+if __name__ == '__main__':
+    print(investment_bank("2018-01", transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)), 100))
