@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 
-from src.views import say_hello, mask_card_number, get_total_amount_expenses, show_cashback, show_transactions_top_5, show_currency_rates_data
+from src.utils import say_hello, mask_card_number, get_total_amount_expenses, show_cashback, show_transactions_top_5, show_currency_rates_data
 
 
 # @patch('src.views.datetime.datetime.now()')

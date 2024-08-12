@@ -1,4 +1,3 @@
-import pandas as pd
 import datetime
 import logging
 import os
@@ -28,15 +27,19 @@ def write_to_path(path=PATH_TO_WRITE):
     def wrapper(function):
         @wraps(function)
         def inner(*args, **kwargs):
-            logger.info("Вызов функции внутри декоратора")
-            result = function(*args, **kwargs)
-            logger.info("Запись в файл")
-            # Запись в файл
-            with open(path, 'w', encoding='utf-8') as file:
-                # file.write(result.to_string(header=False, index=False))
-                # Записывает построчно датафрейм в файл
-                result.to_string(file)
-            return result
+            try:
+                logger.info("Вызов функции внутри декоратора")
+                result = function(*args, **kwargs)
+                logger.info("Запись в файл")
+                # Запись в файл
+                with open(path, 'w', encoding='utf-8') as file:
+                    # file.write(result.to_string(header=False, index=False))
+                    # Записывает построчно датафрейм в файл
+                    result.to_string(file)
+                return result
+            except Exception as e:
+                logger.error(f"Ошибка: {e}")
+                return f"Ошибка: {e}"
         return inner
     return wrapper
 
