@@ -20,6 +20,9 @@ PATH_TO_FILE_FILE_HANDLER = os.path.join(os.path.dirname(os.path.dirname(__file_
 # Файл с пользовательскими настройками
 USERS_SETTINGS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "users_settings.json")
 
+# Самая свежая дата в таблице
+TODAY = "31.12.2021"
+
 logger = logging.getLogger("utils")
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler(PATH_TO_FILE_FILE_HANDLER, "w")
@@ -99,19 +102,6 @@ def say_hello():
 
 def mask_card_number(transactions):
     """ Маскирует номер карты(показывает 4 последние цифры) """
-    # number_card_str = str(number_card)
-    #
-    # # Проверяем корректность введенного номера карты
-    # if len(number_card_str) < 4 or not number_card_str[-4:].isdigit():
-    #     logger.error("Введен некорректный номер карты")
-    #     result = "Некорректный номер карты!"
-    # else:
-    #     logger.info("Создание маски номера карты")
-    #     # Делаем маску номера, заменяем часть строки подстрокой
-    #     result = number_card_str[-4:]
-    #
-    # return result
-
     logger.info("Удаление значений nan")
     # Убираем значения nan из столбца "Номер карты"
     transactions_not_nan = transactions.loc[transactions["Номер карты"].notnull()]
@@ -139,23 +129,40 @@ def show_cashback(expenses: float) -> float:
 #     print(show_cashback(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), "**7197")))
 
 
-def get_total_amount_expenses(transactions, number_card):
+def get_total_amount_expenses(transactions, number_card, date=TODAY):
     """ Общая сумма расходов """
-    number_card_ = number_card
-    # Список для словарей с готовыми данными
-    amount_list = []
+    logger.info("Определение конечного значения даты")
+    date_ = f"{date} 00:00:00"
+    # Конечное значение(до какой даты происходит поиск)
+    end = datetime.datetime.strptime(date_, "%d.%m.%Y %H:%M:%S")
+    date_time = f"{str(end)[5:7]}.{str(end)[:4]} 00:00:00"
+    logger.info("Определение начального значения даты")
+    # Начальное значение(с какой даты начинается поиск)
+    start = datetime.datetime.strptime(f"01.{date_time}", "%d.%m.%Y %H:%M:%S")
 
-    for number in number_card_:
+    logger.info("Создание дополнительного столбца с датой в формате datetime")
+    # Создаем новый столбец "date", в него записываем дату операции в формате объект datetime
+    transactions["date"] = transactions["Дата операции"].map(lambda x: datetime.datetime.strptime(str(x), "%d.%m.%Y %H:%M:%S"))
+    logger.info("Выборка нужных строк по фильтру")
+    # Делаем выборку нужных нам строк(чтобы дата была в нужном промежутке и была нужная категория)
+    amount_expenses = transactions.loc[(transactions["date"] <= end) & (transactions["date"] >= start)]
+
+    # Полученные данные преобразуем в список словарей(выборка транзакций с нужной датой)
+    transactions_list_dicts = amount_expenses.to_dict(orient="records")
+
+    # Список для словарей с готовыми данными(добавляем в него с помощью цикла)
+    amount_list = []
+    for number in number_card:
         # Список, в который попадают все операции по определенной карте
         sum_list = []
 
         # Инициализация словаря
         dict_amount = dict()
         # Добавление номера карты в словарь
-        dict_amount["last_digits"] = number[-4:]
+        dict_amount["last_digits"] = number
 
         amount_list.append(dict_amount)
-        for tr in transactions:
+        for tr in transactions_list_dicts:
             # Проверяем - операция относится к данной карте, статус - ок, не входит в указанные категории и со знаком минус
             if (str(tr.get("Номер карты")) == number and tr.get("Статус") == "OK"
                     and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"]
@@ -165,7 +172,7 @@ def get_total_amount_expenses(transactions, number_card):
 
         logger.info("Рассчет суммы расходов по определенной карте и добавление в словарь")
         # Добавление в словарь трат по определенной карте
-        dict_amount["total_spent"] = -sum(sum_list)
+        dict_amount["total_spent"] = round(abs(sum(sum_list)), 2)
 
         # Общие траты по определенной карте
         total_spent = dict_amount.get("total_spent")
@@ -177,8 +184,8 @@ def get_total_amount_expenses(transactions, number_card):
     return amount_list
 
 
-# if __name__ == '__main__':
-#     print(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
+if __name__ == '__main__':
+    print(get_total_amount_expenses(get_data_from_excel_df(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
 
 
 def show_transactions_top_5(transactions: list[dict]) -> list[dict]:

@@ -92,7 +92,7 @@ def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) 
     deferred_amount_result["month"] = month
     deferred_amount_result["investamount"] = sum(deferred_amount)
 
-    return json.dumps(deferred_amount_result)
+    return json.dumps(deferred_amount_result, ensure_ascii=False)
 
 
 if __name__ == '__main__':

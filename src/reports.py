@@ -6,7 +6,7 @@ from src.utils import get_data_from_excel_df, PATH_TO_FILE_EXCEL
 
 
 # Самая свежая дата в таблице
-TOODAY = "31.12.2021 16:44:00"
+TODAY = "31.12.2021"
 
 # Файл, в который будет сохраняться отчет по тратам по категориям
 PATH_TO_WRITE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "reports_file", "spending_by_category.txt")
@@ -45,10 +45,12 @@ def write_to_path(path=PATH_TO_WRITE):
 
 
 @write_to_path()
-def spending_by_category(transactions, category, date=TOODAY):
+def spending_by_category(transactions, category, date=TODAY):
+    category = category.title()
     logger.info("Определение конечного значения даты")
+    date_ = f"{date} 00:00:00"
     # Конечное значение(до какой даты происходит поиск)
-    end = datetime.datetime.strptime(date, "%d.%m.%Y %H:%M:%S")
+    end = datetime.datetime.strptime(date_, "%d.%m.%Y %H:%M:%S")
     logger.info("Определение начального значения даты")
     # Начальное значение(с какой даты начинается поиск)
     start = end - datetime.timedelta(days=90)
@@ -67,4 +69,4 @@ def spending_by_category(transactions, category, date=TOODAY):
 
 
 if __name__ == '__main__':
-    print(spending_by_category(get_data_from_excel_df(PATH_TO_FILE_EXCEL), "Топливо", "31.12.2021 16:44:00"))
+    print(spending_by_category(get_data_from_excel_df(PATH_TO_FILE_EXCEL), "топливо"))

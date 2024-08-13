@@ -1,12 +1,8 @@
-import datetime
 import json
-
-import requests
-import os
-from src.utils import get_data_from_excel, get_data_from_excel_df, PATH_TO_FILE_EXCEL, say_hello, mask_card_number, get_total_amount_expenses, show_transactions_top_5, show_currency_rates_data, USERS_SETTINGS, show_stock_prices_data_sp500
+from src.utils import get_data_from_excel, get_data_from_excel_df, PATH_TO_FILE_EXCEL, say_hello, mask_card_number, get_total_amount_expenses, show_transactions_top_5, show_currency_rates_data, USERS_SETTINGS, show_stock_prices_data_sp500, TODAY
 
 
-def get_data_for_web_page():
+def get_data_for_web_page(date=TODAY):
     """" Главная функция раздела веб_страниц """
     # Создаем пустой словарь для добавления данных для раздела веб-страницы
     data_web_page = dict()
@@ -16,7 +12,7 @@ def get_data_for_web_page():
     data_web_page["greeting"] = greeting
 
     # Общая сумма расходов по каждой карте
-    cards = get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL)))
+    cards = get_total_amount_expenses(get_data_from_excel_df(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL)), date=TODAY)
     data_web_page["cards"] = cards
 
     # Топ-5 транзакций по сумме платежа
