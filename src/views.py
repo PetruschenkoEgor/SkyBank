@@ -2,7 +2,7 @@ import json
 from src.utils import get_data_from_excel, get_data_from_excel_df, PATH_TO_FILE_EXCEL, say_hello, mask_card_number, get_total_amount_expenses, show_transactions_top_5, show_currency_rates_data, USERS_SETTINGS, show_stock_prices_data_sp500, TODAY
 
 
-def get_data_for_web_page(date=TODAY):
+def get_data_for_web_page(date: str = TODAY) -> str:
     """" Главная функция раздела веб_страниц """
     # Создаем пустой словарь для добавления данных для раздела веб-страницы
     data_web_page = dict()

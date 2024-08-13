@@ -31,7 +31,7 @@ file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
 
 
-def get_data_from_excel(path_to_file):
+def get_data_from_excel(path_to_file: str) -> list:
     """ Функция получает путь к файлу и возвращает список словарей """
     try:
         logger.info("Считывание EXCEL-файла")
@@ -52,7 +52,7 @@ def get_data_from_excel(path_to_file):
 #     print(get_data_from_excel(PATH_TO_FILE_EXCEL))
 
 
-def get_data_from_excel_df(path_to_file):
+def get_data_from_excel_df(path_to_file: str) -> pd.DataFrame | list:
     """ Функция получает путь к файлу и возвращает DataFrame """
     try:
         logger.info("Считывание EXCEL-файла")
@@ -73,11 +73,11 @@ def say_hello():
     """ Функция принимает строку со временем и здоровается в зависимости от времени суток """
     logger.info("Получаем текущее время")
     # Текущее время
-    current_time = str(datetime.datetime.now())[11:16]
+    current_time = datetime.datetime.now()
 
     logger.info("Получаем часы и переводим их в число")
     # Получаем часы и переводим их в число
-    time = int(current_time[:2])
+    time = current_time.hour
 
     # В зависимости от времени здороваемся
     if 6 <= time <= 11:
@@ -100,7 +100,7 @@ def say_hello():
 #     print(say_hello())
 
 
-def mask_card_number(transactions):
+def mask_card_number(transactions: pd.DataFrame) -> list:
     """ Маскирует номер карты(показывает 4 последние цифры) """
     logger.info("Удаление значений nan")
     # Убираем значения nan из столбца "Номер карты"
@@ -125,11 +125,7 @@ def show_cashback(expenses: float) -> float:
     return cashback
 
 
-# if __name__ == '__main__':
-#     print(show_cashback(get_total_amount_expenses(get_data_from_excel(PATH_TO_FILE_EXCEL), "**7197")))
-
-
-def get_total_amount_expenses(transactions, number_card, date=TODAY):
+def get_total_amount_expenses(transactions: pd.DataFrame, number_card: list, date: str = TODAY) -> list[dict]:
     """ Общая сумма расходов """
     logger.info("Определение конечного значения даты")
     date_ = f"{date} 00:00:00"
@@ -184,8 +180,8 @@ def get_total_amount_expenses(transactions, number_card, date=TODAY):
     return amount_list
 
 
-if __name__ == '__main__':
-    print(get_total_amount_expenses(get_data_from_excel_df(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
+# if __name__ == '__main__':
+#     print(get_total_amount_expenses(get_data_from_excel_df(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
 
 
 def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
@@ -216,7 +212,7 @@ def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
 #     print(show_transactions_top_5(get_data_from_excel(PATH_TO_FILE_EXCEL)))
 
 
-def show_currency_rates_data(file=USERS_SETTINGS):
+def show_currency_rates_data(file: str = USERS_SETTINGS) -> list[dict] | str:
     """ Показывает курс валют """
     # Список словарей с курсом валют usd, eur
     currency_list = []
@@ -262,14 +258,14 @@ def show_currency_rates_data(file=USERS_SETTINGS):
         return currency_list
     except requests.exceptions.RequestException as e:
         logger.error(f"Ошибка get-запроса получения курса валют. Ошибка: {e}")
-        return e
+        return f"Ошибка: {e}"
 
 
 # if __name__ == '__main__':
 #     print(show_currency_rates_data())
 
 
-def show_stock_prices_data_sp500(file=USERS_SETTINGS):
+def show_stock_prices_data_sp500(file: str = USERS_SETTINGS) -> list[dict] | str:
     """ Показывает стоимость акций из S&P 500 """
     # Создаем пустой список для словарей с ценами на акции
     prices = []
@@ -320,8 +316,7 @@ def show_stock_prices_data_sp500(file=USERS_SETTINGS):
         return prices
     except requests.exceptions.RequestException as e:
         logger.error(f"Ошибка get-запроса получения курса акций. Ошибка: {e}")
-        return e
-
+        return f"Ошибка: {e}"
 
 # if __name__ == '__main__':
 #     print(show_stock_prices_data_sp500())
