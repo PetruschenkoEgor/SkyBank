@@ -2,8 +2,8 @@ import datetime
 import json
 import logging
 import os
-from src.utils import get_data_from_excel, PATH_TO_FILE_EXCEL
 
+from src.utils import PATH_TO_FILE_EXCEL, get_data_from_excel
 
 # Файл, в который сохраняются логи
 PATH_TO_FILE_FILE_HANDLER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", "services.log")
@@ -46,8 +46,8 @@ def transactions_for_investment_bank(transactions: list[dict]) -> list[dict]:
     return result_list
 
 
-# if __name__ == '__main__':
-#     print(transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)))
+if __name__ == '__main__':
+    print(transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)))
 
 
 def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) -> str:
@@ -100,4 +100,8 @@ def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) 
 
 
 if __name__ == "__main__":
-    print(investment_bank("2018-01", transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)), 100))
+    print(investment_bank("2018-01", [
+        {"date": "2018-01-03", "amount": -3.06},
+        {"date": "2018-01-03", "amount": -51.0},
+        {"date": "2018-01-01", "amount": -316.0},
+    ], 100))

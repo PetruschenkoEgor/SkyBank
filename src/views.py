@@ -1,17 +1,8 @@
 import json
-from src.utils import (
-    get_data_from_excel,
-    get_data_from_excel_df,
-    PATH_TO_FILE_EXCEL,
-    say_hello,
-    mask_card_number,
-    get_total_amount_expenses,
-    show_transactions_top_5,
-    show_currency_rates_data,
-    USERS_SETTINGS,
-    show_stock_prices_data_sp500,
-    TODAY,
-)
+
+from src.utils import (PATH_TO_FILE_EXCEL, TODAY, USERS_SETTINGS, get_data_from_excel, get_data_from_excel_df,
+                       get_total_amount_expenses, mask_card_number, say_hello, show_currency_rates_data,
+                       show_stock_prices_data_sp500, show_transactions_top_5)
 
 
 def get_data_for_web_page(date: str = TODAY) -> str:

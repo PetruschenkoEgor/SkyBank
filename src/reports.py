@@ -1,11 +1,11 @@
 import datetime
-import json
 import logging
 import os
-import pandas as pd
 from functools import wraps
-from src.utils import get_data_from_excel_df, PATH_TO_FILE_EXCEL
 
+import pandas as pd
+
+from src.utils import PATH_TO_FILE_EXCEL, get_data_from_excel_df
 
 # Самая свежая дата в таблице
 TODAY = "31.12.2021"
@@ -74,11 +74,12 @@ def spending_by_category(transactions: pd.DataFrame, category: str, date: str = 
         (transactions["date"] <= end) & (transactions["date"] >= start) & (transactions["Категория"] == category)
     ]
     # Переводим данные в JSON
-    spending_category_json = spending_category.to_json(orient="records",force_ascii=False,lines=True)
-
+    spending_category_json = spending_category.to_json(orient="records", force_ascii=False, lines=True)
+    if spending_category.empty:
+        return "Трат в заданной категории нет."
 
     return spending_category_json
 
 
 if __name__ == "__main__":
-    print(spending_by_category(get_data_from_excel_df(PATH_TO_FILE_EXCEL), "топливо"))
+    print(spending_by_category(get_data_from_excel_df(PATH_TO_FILE_EXCEL), "красота", "20.12.2021"))

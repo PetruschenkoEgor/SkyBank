@@ -1,6 +1,6 @@
 import pytest
 
-from src.services import transactions_for_investment_bank, investment_bank
+from src.services import investment_bank, transactions_for_investment_bank
 
 
 def test_transactions_for_investment_bank(fix_services):
@@ -13,9 +13,46 @@ def test_transactions_for_investment_bank_not_list():
     assert transactions_for_investment_bank([]) == []
 
 
-# def test_investment_bank_10(fix_investment_bank):
-#     """ Тестируем копилку, округление до 10 """
-#     assert investment_bank("2018-01", fix_investment_bank, 10) == 19.9
+@pytest.mark.parametrize(
+    "month, transactions, limit, result",
+    [
+        (
+            "2018-01",
+            [
+                {"date": "2018-01-03", "amount": -3.06},
+                {"date": "2018-01-03", "amount": -51.0},
+                {"date": "2018-01-01", "amount": -316.0},
+            ],
+            10,
+            '{"month": "2018-01", "investamount": 19.9}',
+        ),
+        (
+            "2018-01",
+            [
+                {"date": "2018-01-03", "amount": -3.06},
+                {"date": "2018-01-03", "amount": -51.0},
+                {"date": "2018-01-01", "amount": -316.0},
+            ],
+            50,
+            '{"month": "2018-01", "investamount": 129.9}',
+        ),
+        (
+            (
+                "2018-01",
+                [
+                    {"date": "2018-01-03", "amount": -3.06},
+                    {"date": "2018-01-03", "amount": -51.0},
+                    {"date": "2018-01-01", "amount": -316.0},
+                ],
+                100,
+                '{"month": "2018-01", "investamount": 229.9}',
+            )
+        ),
+    ],
+)
+def test_investment_bank_10(month, transactions, limit, result):
+    """Тестируем копилку, округление до 10, 50, 100"""
+    assert investment_bank(month, transactions, limit) == result
 
 
 # def test_investment_bank_50(fix_investment_bank):

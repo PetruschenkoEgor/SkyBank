@@ -1,12 +1,11 @@
 import datetime
 import json
-
-import requests
-import os
 import logging
-import pandas as pd
-from dotenv import load_dotenv
+import os
 
+import pandas as pd
+import requests
+from dotenv import load_dotenv
 
 # Загрузка переменных из файла .env
 load_dotenv()
@@ -49,7 +48,7 @@ def get_data_from_excel(path_to_file: str) -> list:
 
 
 # if __name__ == "__main__":
-#     print(get_data_from_excel(PATH_TO_FILE_EXCEL))
+#     print(get_data_from_excel(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "df_1.xlsx")))
 
 
 def get_data_from_excel_df(path_to_file: str) -> pd.DataFrame | list:
@@ -186,9 +185,9 @@ def get_total_amount_expenses(transactions: pd.DataFrame, number_card: list, dat
     return amount_list
 
 
-# if __name__ == '__main__':
-#     print(get_total_amount_expenses(get_data_from_excel_df(PATH_TO_FILE_EXCEL),
-#     mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
+if __name__ == '__main__':
+    print(get_total_amount_expenses(get_data_from_excel_df(PATH_TO_FILE_EXCEL),
+                                    mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
 
 
 def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
@@ -236,9 +235,10 @@ def show_currency_rates_data(file: str = USERS_SETTINGS) -> list[dict] | str:
     try:
         for ticker in data.get("user_currencies"):
             # Получение курса USD
-            payload = {"symbols": "RUB", "base": {ticker}}
+            # payload = {"symbols": "RUB", "base": [ticker]}
+            url = f"https://api.apilayer.com/exchangerates_data/latest?symbols=RUBs&base={ticker}"
             logger.info("Выполнение get-запроса на получение курса валют")
-            response = requests.get(url, headers=headers, params=payload)
+            response = requests.request("GET", url, headers=headers)
             logger.info("Получение статус-кода get-запроса на получение курса валют")
             # Получаем статус запроса
             status_code = response.status_code
@@ -285,7 +285,7 @@ def show_stock_prices_data_sp500(file: str = USERS_SETTINGS) -> list[dict] | str
     try:
         # Подставляем каждый тикер в get-запрос
         for ticker in data.get("user_stocks"):
-            # url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={apikey}"
+            url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={apikey}"
             logger.info("Выполнение get-запроса на получение цен на акции")
             response = requests.get(url)
             logger.info("Получение статус-кода на получение цен на акции")
