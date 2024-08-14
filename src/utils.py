@@ -32,7 +32,7 @@ logger.addHandler(file_handler)
 
 
 def get_data_from_excel(path_to_file: str) -> list:
-    """ Функция получает путь к файлу и возвращает список словарей """
+    """Функция получает путь к файлу и возвращает список словарей"""
     try:
         logger.info("Считывание EXCEL-файла")
         # Считываем Excel-файл
@@ -44,7 +44,7 @@ def get_data_from_excel(path_to_file: str) -> list:
 
         return transactions_list_dicts
     except FileNotFoundError:
-        logger.error(f"Ошибка: файл не найден")
+        logger.error("Ошибка: файл не найден")
         return []
 
 
@@ -53,7 +53,7 @@ def get_data_from_excel(path_to_file: str) -> list:
 
 
 def get_data_from_excel_df(path_to_file: str) -> pd.DataFrame | list:
-    """ Функция получает путь к файлу и возвращает DataFrame """
+    """Функция получает путь к файлу и возвращает DataFrame"""
     try:
         logger.info("Считывание EXCEL-файла")
         # Считываем Excel-файл
@@ -61,7 +61,7 @@ def get_data_from_excel_df(path_to_file: str) -> pd.DataFrame | list:
 
         return transactions_excel
     except FileNotFoundError:
-        logger.error(f"Ошибка: файл не найден")
+        logger.error("Ошибка: файл не найден")
         return []
 
 
@@ -70,7 +70,7 @@ def get_data_from_excel_df(path_to_file: str) -> pd.DataFrame | list:
 
 
 def say_hello():
-    """ Функция принимает строку со временем и здоровается в зависимости от времени суток """
+    """Функция принимает строку со временем и здоровается в зависимости от времени суток"""
     logger.info("Получаем текущее время")
     # Текущее время
     current_time = datetime.datetime.now()
@@ -101,7 +101,7 @@ def say_hello():
 
 
 def mask_card_number(transactions: pd.DataFrame) -> list:
-    """ Маскирует номер карты(показывает 4 последние цифры) """
+    """Маскирует номер карты(показывает 4 последние цифры)"""
     logger.info("Удаление значений nan")
     # Убираем значения nan из столбца "Номер карты"
     transactions_not_nan = transactions.loc[transactions["Номер карты"].notnull()]
@@ -118,7 +118,7 @@ def mask_card_number(transactions: pd.DataFrame) -> list:
 
 
 def show_cashback(expenses: float) -> float:
-    """ Функция считает кэшбэк(1 рубль за каждые 100 рублей) """
+    """Функция считает кэшбэк(1 рубль за каждые 100 рублей)"""
     logger.info("Рассчет и округление кэшбэка")
     # Рассчитываем кэшбэк и округляем до двух цифр после запятой
     cashback = round(expenses * 0.01, 2)
@@ -126,7 +126,7 @@ def show_cashback(expenses: float) -> float:
 
 
 def get_total_amount_expenses(transactions: pd.DataFrame, number_card: list, date: str = TODAY) -> list[dict]:
-    """ Общая сумма расходов """
+    """Общая сумма расходов"""
     logger.info("Определение конечного значения даты")
     date_ = f"{date} 00:00:00"
     # Конечное значение(до какой даты происходит поиск)
@@ -138,7 +138,9 @@ def get_total_amount_expenses(transactions: pd.DataFrame, number_card: list, dat
 
     logger.info("Создание дополнительного столбца с датой в формате datetime")
     # Создаем новый столбец "date", в него записываем дату операции в формате объект datetime
-    transactions["date"] = transactions["Дата операции"].map(lambda x: datetime.datetime.strptime(str(x), "%d.%m.%Y %H:%M:%S"))
+    transactions["date"] = transactions["Дата операции"].map(
+        lambda x: datetime.datetime.strptime(str(x), "%d.%m.%Y %H:%M:%S")
+    )
     logger.info("Выборка нужных строк по фильтру")
     # Делаем выборку нужных нам строк(чтобы дата была в нужном промежутке и была нужная категория)
     amount_expenses = transactions.loc[(transactions["date"] <= end) & (transactions["date"] >= start)]
@@ -159,10 +161,14 @@ def get_total_amount_expenses(transactions: pd.DataFrame, number_card: list, dat
 
         amount_list.append(dict_amount)
         for tr in transactions_list_dicts:
-            # Проверяем - операция относится к данной карте, статус - ок, не входит в указанные категории и со знаком минус
-            if (str(tr.get("Номер карты")) == number and tr.get("Статус") == "OK"
-                    and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"]
-                    and float(tr.get("Сумма платежа")) < 0):
+            # Проверяем - операция относится к данной карте, статус - ок, не входит в указанные категории
+            # и со знаком минус
+            if (
+                str(tr.get("Номер карты")) == number
+                and tr.get("Статус") == "OK"
+                and tr.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"]
+                and float(tr.get("Сумма платежа")) < 0
+            ):
                 logger.info("Добавление в список суммы платежа")
                 sum_list.append(tr.get("Сумма платежа"))
 
@@ -181,11 +187,12 @@ def get_total_amount_expenses(transactions: pd.DataFrame, number_card: list, dat
 
 
 # if __name__ == '__main__':
-#     print(get_total_amount_expenses(get_data_from_excel_df(PATH_TO_FILE_EXCEL), mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
+#     print(get_total_amount_expenses(get_data_from_excel_df(PATH_TO_FILE_EXCEL),
+#     mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
 
 
 def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
-    """ Показывает топ 5 транзакций по сумме платежа """
+    """Показывает топ 5 транзакций по сумме платежа"""
     logger.info("Сортировка транзакций по сумме платежа")
     # Сортируем транзакции по тратам(от большего к меньшему)
     sorted_trans = sorted(transactions, key=lambda x: x.get("Сумма платежа"))
@@ -213,7 +220,7 @@ def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
 
 
 def show_currency_rates_data(file: str = USERS_SETTINGS) -> list[dict] | str:
-    """ Показывает курс валют """
+    """Показывает курс валют"""
     # Список словарей с курсом валют usd, eur
     currency_list = []
 
@@ -229,10 +236,7 @@ def show_currency_rates_data(file: str = USERS_SETTINGS) -> list[dict] | str:
     try:
         for ticker in data.get("user_currencies"):
             # Получение курса USD
-            payload = {
-                "symbols": "RUB",
-                "base": {ticker}
-            }
+            payload = {"symbols": "RUB", "base": {ticker}}
             logger.info("Выполнение get-запроса на получение курса валют")
             response = requests.get(url, headers=headers, params=payload)
             logger.info("Получение статус-кода get-запроса на получение курса валют")
@@ -266,7 +270,7 @@ def show_currency_rates_data(file: str = USERS_SETTINGS) -> list[dict] | str:
 
 
 def show_stock_prices_data_sp500(file: str = USERS_SETTINGS) -> list[dict] | str:
-    """ Показывает стоимость акций из S&P 500 """
+    """Показывает стоимость акций из S&P 500"""
     # Создаем пустой список для словарей с ценами на акции
     prices = []
 
@@ -306,7 +310,7 @@ def show_stock_prices_data_sp500(file: str = USERS_SETTINGS) -> list[dict] | str
                     prices.append(price_dict)
                 # Сообщение о том, что API запросы закончились
                 else:
-                    logger.error(f"Запросы на получение API на сегодня закончились")
+                    logger.error("Запросы на получение API на сегодня закончились")
                     return "Запросы на сегодня закончились! Приходите завтра! В день разрешено 25 запросов!"
             # Произошла ошибка
             else:
@@ -317,6 +321,7 @@ def show_stock_prices_data_sp500(file: str = USERS_SETTINGS) -> list[dict] | str
     except requests.exceptions.RequestException as e:
         logger.error(f"Ошибка get-запроса получения курса акций. Ошибка: {e}")
         return f"Ошибка: {e}"
+
 
 # if __name__ == '__main__':
 #     print(show_stock_prices_data_sp500())

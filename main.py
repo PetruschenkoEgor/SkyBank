@@ -2,13 +2,18 @@ import json
 import re
 
 from src.views import get_data_for_web_page
-from src.utils import say_hello, get_total_amount_expenses, PATH_TO_FILE_EXCEL, get_data_from_excel, get_data_from_excel_df
+from src.utils import (
+    say_hello,
+    PATH_TO_FILE_EXCEL,
+    get_data_from_excel,
+    get_data_from_excel_df,
+)
 from src.services import investment_bank, transactions_for_investment_bank
-from src.reports import spending_by_category, write_to_path
+from src.reports import spending_by_category
 
 
 def main():
-    """ Главная функция """
+    """Главная функция"""
     # Главная функция раздела Главная страница
     views_main = json.loads(get_data_for_web_page())
 
@@ -37,10 +42,12 @@ def main():
         if top_5 == "да":
             print("ТОП-5 трат по вашим картам:")
             for top in views_main.get("top_transactions"):
-                print(f"Дата: {top.get("date")}\n"
-                      f"Сумма: {top.get("amount")}\n"
-                      f"Категория: {top.get("category")}\n"
-                      f"Информация: {top.get("description")}")
+                print(
+                    f"Дата: {top.get("date")}\n"
+                    f"Сумма: {top.get("amount")}\n"
+                    f"Категория: {top.get("category")}\n"
+                    f"Информация: {top.get("description")}"
+                )
             break
         elif top_5 == "нет":
             break
@@ -49,37 +56,41 @@ def main():
             top_5 = input("Хотите получить ТОП-5 трат по вашим картам? Да/Нет: ").lower()
 
     # Курсы валют
-    # currency_rates = input("Хотите получить информацию о курсах валют? Да/Нет: ").lower()
-    # while True:
-    #     if currency_rates == "да":
-    #         print("Информация по курсам валют USD и EUR:")
-    #         for currency in views_main.get("currency_rates"):
-    #             print(f"Валюта: {currency.get("currency")}\n"
-    #                   f"Курс: {currency.get("rate")}")
-    #         break
-    #     elif currency_rates == "нет":
-    #         break
-    #     else:
-    #         print("Введите Да или Нет!")
-    #         currency_rates = input("Хотите получить информацию о курсах валют? Да/Нет: ").lower()
+    currency_rates = input("Хотите получить информацию о курсах валют? Да/Нет: ").lower()
+    while True:
+        if currency_rates == "да":
+            print("Информация по курсам валют USD и EUR:")
+            for currency in views_main.get("currency_rates"):
+                print(f"Валюта: {currency.get("currency")}\n" f"Курс: {currency.get("rate")}")
+            break
+        elif currency_rates == "нет":
+            break
+        else:
+            print("Введите Да или Нет!")
+            currency_rates = input("Хотите получить информацию о курсах валют? Да/Нет: ").lower()
 
     # Цены акций S&P 500
-    # s_p = input("Хотите получить информацию о ценах на акции крупнейших американских компаний S&P 500? Да/Нет: ").lower()
-    # while True:
-    #     if s_p == "да":
-    #         print("Информация о ценах на акции крупнейших американских компаний S&P 500:")
-    #         for sp in views_main.get("stock_prices"):
-    #             print(f"Тикер: {sp.get("stock")}\n"
-    #                   f"Цена: {sp.get("rate")}")
-    #         break
-    #     elif s_p == "нет":
-    #         break
-    #     else:
-    #         print("Введите Да или Нет!")
-    #         s_p = input("Хотите получить информацию о ценах на акции крупнейших американских компаний S&P 500? Да/Нет: ").lower()
+    s_p = input(
+        "Хотите получить информацию о ценах на акции крупнейших американских компаний S&P 500? Да/Нет: "
+    ).lower()
+    while True:
+        if s_p == "да":
+            print("Информация о ценах на акции крупнейших американских компаний S&P 500:")
+            for sp in views_main.get("stock_prices"):
+                print(f"Тикер: {sp.get("stock")}\n" f"Цена: {sp.get("rate")}")
+            break
+        elif s_p == "нет":
+            break
+        else:
+            print("Введите Да или Нет!")
+            s_p = input(
+                "Хотите получить информацию о ценах на акции крупнейших американских компаний S&P 500? Да/Нет: "
+            ).lower()
 
     # Инвесткопилка
-    investing = input("Хотите узнать сколько вы бы отложили в инвест копилку по своим картам за месяц? Да/Нет: ").lower()
+    investing = input(
+        "Хотите узнать сколько вы бы отложили в инвест копилку по своим картам за месяц? Да/Нет: "
+    ).lower()
     while True:
         if investing == "да":
             # month = input("Введите год и месяц в формате 'ГГГГ-ММ': ")
@@ -90,8 +101,17 @@ def main():
                     while True:
                         limit = input("Укажите до какой суммы округлять(10, 50 или 100 руб): ")
                         if limit == "10" or limit == "50" or limit == "100":
-                            invest_bank = json.loads(investment_bank(month, transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)), int(limit)))
-                            print(f"За {month[-2:]} месяц {month[:4]} года вы могли бы отложить {invest_bank.get("investamount")} рублей")
+                            invest_bank = json.loads(
+                                investment_bank(
+                                    month,
+                                    transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)),
+                                    int(limit),
+                                )
+                            )
+                            print(
+                                f"За {month[-2:]} месяц {month[:4]} года вы могли бы отложить \n"
+                                f"{invest_bank.get("investamount")} рублей"
+                            )
                             break
                         else:
                             print("Выберите из значений 10, 50 или 100.")
@@ -104,7 +124,9 @@ def main():
             break
         else:
             print("Введите Да или Нет!")
-            investing = input("Хотите узнать сколько вы бы отложили в инвест копилку по своим картам за месяц? Да/Нет: ").lower()
+            investing = input(
+                "Хотите узнать сколько вы бы отложили в инвест копилку по своим картам за месяц? Да/Нет: "
+            ).lower()
 
     # Отчеты
     while True:
@@ -133,5 +155,5 @@ def main():
             print("Введите Да или Нет!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(main())

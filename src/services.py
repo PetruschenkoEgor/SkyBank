@@ -17,7 +17,7 @@ logger.addHandler(file_handler)
 
 
 def transactions_for_investment_bank(transactions: list[dict]) -> list[dict]:
-    """ Функция преобразует список транзакций для инвест-копилки """
+    """Функция преобразует список транзакций для инвест-копилки"""
     # Создаем пустой список, куда будем накидывать словари с нужными данными
     result_list = []
 
@@ -25,7 +25,11 @@ def transactions_for_investment_bank(transactions: list[dict]) -> list[dict]:
     for trans in transactions:
         logger.info("Проверка транзакции(успешный статус, нужные категории и операция со знаком минус)")
         # Проверяем, что бы транзакция была действительно успешной тратой
-        if trans.get("Статус") == "OK" and trans.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"] and float(trans.get("Сумма платежа")) < 0:
+        if (
+            trans.get("Статус") == "OK"
+            and trans.get("Категория") not in ["Переводы", "Пополнения", "Другое", "Бонусы", "Наличные"]
+            and float(trans.get("Сумма платежа")) < 0
+        ):
             dict_trans = dict()
 
             # Добавляем дату в словарь
@@ -47,7 +51,7 @@ def transactions_for_investment_bank(transactions: list[dict]) -> list[dict]:
 
 
 def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) -> str:
-    """ Копилка, возвращает сумму, которую округлили до 10, 50 или 100 рублей и откладывают в инвесткопилку """
+    """Копилка, возвращает сумму, которую округлили до 10, 50 или 100 рублей и откладывают в инвесткопилку"""
     # Возможная отложенная сумма
     deferred_amount = []
 
@@ -95,5 +99,5 @@ def investment_bank(month: str, transactions: list[dict[str, any]], limit: int) 
     return json.dumps(deferred_amount_result, ensure_ascii=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(investment_bank("2018-01", transactions_for_investment_bank(get_data_from_excel(PATH_TO_FILE_EXCEL)), 100))

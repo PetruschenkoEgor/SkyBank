@@ -137,7 +137,7 @@ def df():
 
 @pytest.fixture
 def trans_2():
-    """ Две транзакции """
+    """Две транзакции"""
     return [
         {
             "Дата операции": "03.01.2018 14:55:21",
@@ -172,12 +172,13 @@ def trans_2():
             "Бонусы (включая кэшбэк)": 6,
             "Округление на инвесткопилку": 0,
             "Сумма операции с округлением": 316.0,
-        }]
+        },
+    ]
 
 
 @pytest.fixture
 def fix_services():
-    """ Фикстура для services """
+    """Фикстура для services"""
     return [
         {
             "Дата операции": "03.01.2018 14:55:21",
@@ -286,9 +287,13 @@ def fix_services():
 
 @pytest.fixture
 def fix_investment_bank():
-    return [{'date': '2018-01-03', 'amount': -3.06}, {'date': '2018-01-03', 'amount': -51.0}, {'date': '2018-01-01', 'amount': -316.0}]
+    return [
+        {"date": "2018-01-03", "amount": -3.06},
+        {"date": "2018-01-03", "amount": -51.0},
+        {"date": "2018-01-01", "amount": -316.0},
+    ]
 
 
 @pytest.fixture
 def fix_0():
-    return [{'date': '2018-01-01', 'amount': 0.0}]
+    return [{"date": "2018-01-01", "amount": 0.0}]

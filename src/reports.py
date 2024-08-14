@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import os
 import pandas as pd
@@ -24,7 +25,8 @@ logger.addHandler(file_handler)
 
 
 def write_to_path(path=PATH_TO_WRITE):
-    """ Декоратор, запись в файл """
+    """Декоратор, запись в файл"""
+
     def wrapper(function):
         @wraps(function)
         def inner(*args, **kwargs):
@@ -33,21 +35,22 @@ def write_to_path(path=PATH_TO_WRITE):
                 result = function(*args, **kwargs)
                 logger.info("Запись в файл")
                 # Запись в файл
-                with open(path, 'w', encoding='utf-8') as file:
-                    # file.write(result.to_string(header=False, index=False))
+                with open(path, "w", encoding="utf-8") as file:
+                    file.write(result)
                     # Записывает построчно датафрейм в файл
-                    result.to_string(file)
                 return result
             except Exception as e:
                 logger.error(f"Ошибка: {e}")
                 return f"Ошибка: {e}"
+
         return inner
+
     return wrapper
 
 
 @write_to_path()
-def spending_by_category(transactions: pd.DataFrame, category: str, date: str = TODAY) -> pd.DataFrame:
-    """ Траты по категориям за 3 месяца """
+def spending_by_category(transactions: pd.DataFrame, category: str, date: str = TODAY) -> str:
+    """Траты по категориям за 3 месяца"""
     category = category.title()
 
     logger.info("Определение конечного значения даты")
@@ -61,14 +64,21 @@ def spending_by_category(transactions: pd.DataFrame, category: str, date: str = 
 
     logger.info("Создание дополнительного столбца с датой в формате datetime")
     # Создаем новый столбец "date", в него записываем дату операции в формате объект datetime
-    transactions["date"] = transactions["Дата операции"].map(lambda x: datetime.datetime.strptime(str(x), "%d.%m.%Y %H:%M:%S"))
+    transactions["date"] = transactions["Дата операции"].map(
+        lambda x: datetime.datetime.strptime(str(x), "%d.%m.%Y %H:%M:%S")
+    )
 
     logger.info("Выборка нужных строк по фильтру")
     # Делаем выборку нужных нам строк(чтобы дата была в нужном промежутке и была нужная категория)
-    spending_category = transactions.loc[(transactions["date"] <= end) & (transactions["date"] >= start) & (transactions["Категория"] == category)]
+    spending_category = transactions.loc[
+        (transactions["date"] <= end) & (transactions["date"] >= start) & (transactions["Категория"] == category)
+    ]
+    # Переводим данные в JSON
+    spending_category_json = spending_category.to_json(orient="records",force_ascii=False,lines=True)
 
-    return spending_category
+
+    return spending_category_json
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(spending_by_category(get_data_from_excel_df(PATH_TO_FILE_EXCEL), "топливо"))

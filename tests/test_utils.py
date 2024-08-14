@@ -1,7 +1,22 @@
+import pandas as pd
 import pytest
 from unittest.mock import patch
 import datetime
-from src.utils import say_hello, mask_card_number, get_total_amount_expenses, show_cashback, show_transactions_top_5, show_currency_rates_data
+import os
+from src.utils import (
+    say_hello,
+    mask_card_number,
+    get_total_amount_expenses,
+    show_cashback,
+    show_transactions_top_5,
+    show_currency_rates_data,
+    get_data_from_excel_df,
+    get_data_from_excel
+)
+
+
+PATH_TO_FILE_EMPTY = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "emptyr.xlsx")
+PATH_TO_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "df_1.xlsx")
 
 
 # @patch('src.utils.datetime')
@@ -83,7 +98,10 @@ def test_show_transactions_top_5_not_transactions():
 
 def test_show_transactions_top_5_2(trans_2):
     """Тестируем, если транзакции всего 2"""
-    assert show_transactions_top_5(trans_2) == [{'date': '04.01.2018', 'amount': -316.0, 'category': 'Красота', 'description': 'OOO Balid'}, {'date': '05.01.2018', 'amount': -21.0, 'category': 'Красота', 'description': 'OOO Balid'}]
+    assert show_transactions_top_5(trans_2) == [
+        {"date": "04.01.2018", "amount": -316.0, "category": "Красота", "description": "OOO Balid"},
+        {"date": "05.01.2018", "amount": -21.0, "category": "Красота", "description": "OOO Balid"},
+    ]
 
 
 # @patch("src.views.response")
@@ -93,3 +111,25 @@ def test_show_transactions_top_5_2(trans_2):
 #     mock_get.return_value.json.return_value = {'success': True, 'timestamp': 1723358944, 'base': 'USD', 'date': '2024-08-11', 'rates': {'RUB': 86.80366}}
 #     result = show_currency_rates_data()
 #     assert result == [{'currency': {'USD'}, 'rate': 86.8}]
+
+def test_get_data_from_excel_df():
+    """ Тест, если файл не найден """
+    assert get_data_from_excel_df(PATH_TO_FILE_EMPTY) == []
+
+
+# def test_get_data_from_excel_df_read():
+#     """ Тест на считывание DataFrame """
+#     assert get_data_from_excel_df(PATH_TO_FILE) ==
+
+
+def test_get_data_from_excel():
+    """ Тест, если файл не найден """
+    assert get_data_from_excel(PATH_TO_FILE_EMPTY) == []
+
+
+def test_get_data_from_excel_read():
+    """ Тест на считывание DataFrame """
+    assert get_data_from_excel(PATH_TO_FILE) == [{'Unnamed: 0': 0, 'Дата операции': '18.12.2021 16:53:16', 'Дата платежа': '20.12.2021', 'Номер карты': '*7197', 'Статус': 'OK', 'Сумма операции': -176, 'Валюта операции': 'RUB', 'Сумма платежа': -176, 'Валюта платежа': 'RUB', 'Кэшбэк': nan, 'Категория': 'Топливо', 'MCC': 5541, 'Описание': 'ЛУКОЙЛ', 'Бонусы (включая кэшбэк)': 3, 'Округление на инвесткопилку': 0, 'Сумма операции с округлением': 176}]
+
+# df = pd.DataFrame({"Дата операции": ["18.12.2021 16:53:16"], "Дата платежа": ["20.12.2021"], "Номер карты": ["*7197"], "Статус": ["OK"], "Сумма операции": [-176.0], "Валюта операции": ["RUB"], "Сумма платежа": [-176.0], "Валюта платежа": ["RUB"], "Кэшбэк": ["NaN"], "Категория": ["Топливо"], "MCC": [5541.0], "Описание": ["ЛУКОЙЛ"], "Бонусы (включая кэшбэк)": [3], "Округление на инвесткопилку": [0], "Сумма операции с округлением": [176.0]})
+# df.to_excel(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "df_1.xlsx"))

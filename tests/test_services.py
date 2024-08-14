@@ -4,12 +4,12 @@ from src.services import transactions_for_investment_bank, investment_bank
 
 
 def test_transactions_for_investment_bank(fix_services):
-    """ Тестируем правильное добавление данных из транзакции """
-    assert transactions_for_investment_bank(fix_services) == [{'date': '2018-01-23', 'amount': -284.0}]
+    """Тестируем правильное добавление данных из транзакции"""
+    assert transactions_for_investment_bank(fix_services) == [{"date": "2018-01-23", "amount": -284.0}]
 
 
 def test_transactions_for_investment_bank_not_list():
-    """ Пустой список на вход """
+    """Пустой список на вход"""
     assert transactions_for_investment_bank([]) == []
 
 
