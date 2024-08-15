@@ -185,9 +185,9 @@ def get_total_amount_expenses(transactions: pd.DataFrame, number_card: list, dat
     return amount_list
 
 
-if __name__ == '__main__':
-    print(get_total_amount_expenses(get_data_from_excel_df(PATH_TO_FILE_EXCEL),
-                                    mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
+# if __name__ == '__main__':
+#     print(get_total_amount_expenses(get_data_from_excel_df(PATH_TO_FILE_EXCEL),
+#                                     mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL))))
 
 
 def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
@@ -235,10 +235,10 @@ def show_currency_rates_data(file: str = USERS_SETTINGS) -> list[dict] | str:
     try:
         for ticker in data.get("user_currencies"):
             # Получение курса USD
-            # payload = {"symbols": "RUB", "base": [ticker]}
-            url = f"https://api.apilayer.com/exchangerates_data/latest?symbols=RUBs&base={ticker}"
+            payload = {"symbols": ["RUB"], "base": ticker}
+            url = "https://api.apilayer.com/exchangerates_data/latest"
             logger.info("Выполнение get-запроса на получение курса валют")
-            response = requests.request("GET", url, headers=headers)
+            response = requests.get(url, headers=headers, data=payload)
             logger.info("Получение статус-кода get-запроса на получение курса валют")
             # Получаем статус запроса
             status_code = response.status_code
@@ -296,7 +296,7 @@ def show_stock_prices_data_sp500(file: str = USERS_SETTINGS) -> list[dict] | str
                 # Получаем эту строку, если API запросы закончились
                 info = "Thank you for using Alpha Vantage! Our standard API rate limit is 25 requests per day."
                 # Проверяем, что API запросы у нас не закончились
-                if info not in response.json().get("Information"):
+                if info != response.json().get("Information"):
                     logger.info("Получение цен на акции")
                     # Получаем нужные нам значения из полученных данных
                     result = response.json().get("Global Quote")
