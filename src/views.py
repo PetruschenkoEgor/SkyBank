@@ -27,12 +27,12 @@ def get_data_for_web_page(date: str = TODAY) -> str:
     data_web_page["top_transactions"] = top_transactions
 
     # Курсы валют
-    # currency_rates = show_currency_rates_data(USERS_SETTINGS)
-    # data_web_page["currency_rates"] = currency_rates
+    currency_rates = show_currency_rates_data()
+    data_web_page["currency_rates"] = currency_rates
 
     # Цены на акции S&P 500
-    # stock_prices = show_stock_prices_data_sp500(USERS_SETTINGS)
-    # data_web_page["stock_prices"] = stock_prices
+    stock_prices = show_stock_prices_data_sp500(USERS_SETTINGS)
+    data_web_page["stock_prices"] = stock_prices
 
     return json.dumps(data_web_page, ensure_ascii=False)
 

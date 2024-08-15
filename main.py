@@ -51,36 +51,36 @@ def main():
             top_5 = input("Хотите получить ТОП-5 трат по вашим картам? Да/Нет: ").lower()
 
     # Курсы валют
-    # currency_rates = input("Хотите получить информацию о курсах валют? Да/Нет: ").lower()
-    # while True:
-    #     if currency_rates == "да":
-    #         print("Информация по курсам валют USD и EUR:")
-    #         for currency in views_main.get("currency_rates"):
-    #             print(f"Валюта: {currency.get("currency")}\n" f"Курс: {currency.get("rate")}")
-    #         break
-    #     elif currency_rates == "нет":
-    #         break
-    #     else:
-    #         print("Введите Да или Нет!")
-    #         currency_rates = input("Хотите получить информацию о курсах валют? Да/Нет: ").lower()
+    currency_rates = input("Хотите получить информацию о курсах валют? Да/Нет: ").lower()
+    while True:
+        if currency_rates == "да":
+            print("Информация по курсам валют USD и EUR:")
+            for currency in views_main.get("currency_rates"):
+                print(f"Валюта: {currency.get("currency")}\n" f"Курс: {currency.get("rate")}")
+            break
+        elif currency_rates == "нет":
+            break
+        else:
+            print("Введите Да или Нет!")
+            currency_rates = input("Хотите получить информацию о курсах валют? Да/Нет: ").lower()
 
     # Цены акций S&P 500
-    # s_p = input(
-    #     "Хотите получить информацию о ценах на акции крупнейших американских компаний S&P 500? Да/Нет: "
-    # ).lower()
-    # while True:
-    #     if s_p == "да":
-    #         print("Информация о ценах на акции крупнейших американских компаний S&P 500:")
-    #         for sp in views_main.get("stock_prices"):
-    #             print(f"Тикер: {sp.get("stock")}\n" f"Цена: {sp.get("rate")}")
-    #         break
-    #     elif s_p == "нет":
-    #         break
-    #     else:
-    #         print("Введите Да или Нет!")
-    #         s_p = input(
-    #             "Хотите получить информацию о ценах на акции крупнейших американских компаний S&P 500? Да/Нет: "
-    #         ).lower()
+    s_p = input(
+        "Хотите получить информацию о ценах на акции крупнейших американских компаний S&P 500? Да/Нет: "
+    ).lower()
+    while True:
+        if s_p == "да":
+            print("Информация о ценах на акции крупнейших американских компаний S&P 500:")
+            for sp in views_main.get("stock_prices"):
+                print(f"Тикер: {sp.get("stock")}\n" f"Цена: {sp.get("rate")}")
+            break
+        elif s_p == "нет":
+            break
+        else:
+            print("Введите Да или Нет!")
+            s_p = input(
+                "Хотите получить информацию о ценах на акции крупнейших американских компаний S&P 500? Да/Нет: "
+            ).lower()
 
     # Инвесткопилка
     investing = input(

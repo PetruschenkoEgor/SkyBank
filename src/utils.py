@@ -218,51 +218,75 @@ def show_transactions_top_5(transactions: list[dict]) -> list[dict]:
 #     print(show_transactions_top_5(get_data_from_excel(PATH_TO_FILE_EXCEL)))
 
 
-def show_currency_rates_data(file: str = USERS_SETTINGS) -> list[dict] | str:
+# def show_currency_rates_data(file: str = USERS_SETTINGS) -> list[dict] | str:
+#     """Показывает курс валют"""
+#     # Список словарей с курсом валют usd, eur
+#     currency_list = []
+#
+#     logger.info("Открытие файла с пользовательскими настройками")
+#     # Открываем json-файл с пользовательскими настройками
+#     with open(file) as f:
+#         data = json.load(f)
+#
+#     # url = "https://api.apilayer.com/exchangerates_data/latest"
+#     # Получение значения переменной API_KEY из .env-файла
+#     headers = os.getenv("API_KEY_CURRENCY_RATES")
+#
+#     try:
+#         for ticker in data.get("user_currencies"):
+#             # Получение курса USD
+#             payload = {"symbols": ["RUB"], "base": ticker}
+#             url = "https://api.apilayer.com/exchangerates_data/latest"
+#             logger.info("Выполнение get-запроса на получение курса валют")
+#             response = requests.get(url, headers=headers, data=payload)
+#             logger.info("Получение статус-кода get-запроса на получение курса валют")
+#             # Получаем статус запроса
+#             status_code = response.status_code
+#
+#             if status_code == 200:
+#                 logger.info("Получение курса валют и округление до 2 цифр после запятой")
+#                 result = response.json().get("rates")
+#                 result = round(result.get("RUB"), 2)
+#
+#                 logger.info("Добавление курсов валют")
+#                 # Создаем пустой словарь для курса валют и добавляем в него данные
+#                 dict_currency = dict()
+#                 dict_currency["currency"] = {ticker}
+#                 dict_currency["rate"] = result
+#                 # Добавляем словарь в список
+#                 currency_list.append(dict_currency)
+#             else:
+#                 logger.error(f"Ошибка get-запроса получения курса валют. Статус код: {status_code}")
+#                 return f"Произошла ошибка! Статус-код: {status_code}"
+#
+#         return currency_list
+#     except requests.exceptions.RequestException as e:
+#         logger.error(f"Ошибка get-запроса получения курса валют. Ошибка: {e}")
+#         return f"Ошибка: {e}"
+
+
+def show_currency_rates_data():
     """Показывает курс валют"""
-    # Список словарей с курсом валют usd, eur
-    currency_list = []
-
-    logger.info("Открытие файла с пользовательскими настройками")
-    # Открываем json-файл с пользовательскими настройками
-    with open(file) as f:
-        data = json.load(f)
-
-    # url = "https://api.apilayer.com/exchangerates_data/latest"
-    # Получение значения переменной API_KEY из .env-файла
-    headers = os.getenv("API_KEY_CURRENCY_RATES")
-
-    try:
-        for ticker in data.get("user_currencies"):
-            # Получение курса USD
-            payload = {"symbols": ["RUB"], "base": ticker}
-            url = "https://api.apilayer.com/exchangerates_data/latest"
-            logger.info("Выполнение get-запроса на получение курса валют")
-            response = requests.get(url, headers=headers, data=payload)
-            logger.info("Получение статус-кода get-запроса на получение курса валют")
-            # Получаем статус запроса
-            status_code = response.status_code
-
-            if status_code == 200:
-                logger.info("Получение курса валют и округление до 2 цифр после запятой")
-                result = response.json().get("rates")
-                result = round(result.get("RUB"), 2)
-
-                logger.info("Добавление курсов валют")
-                # Создаем пустой словарь для курса валют и добавляем в него данные
-                dict_currency = dict()
-                dict_currency["currency"] = {ticker}
-                dict_currency["rate"] = result
-                # Добавляем словарь в список
-                currency_list.append(dict_currency)
-            else:
-                logger.error(f"Ошибка get-запроса получения курса валют. Статус код: {status_code}")
-                return f"Произошла ошибка! Статус-код: {status_code}"
-
-        return currency_list
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Ошибка get-запроса получения курса валют. Ошибка: {e}")
-        return f"Ошибка: {e}"
+    api_key = os.getenv("API_KEY_CURRENCY_RATES")
+    response = requests.get(
+        f"https://currate.ru/api/?get=rates&pairs=USDRUB,EURRUB&key={api_key}")
+    status_code = response.status_code
+    if status_code == 200:
+        result = response.json()
+        rate_usd = dict()
+        rate_usd["currency"] = "USD"
+        usd = round(float((result.get("data")).get("USDRUB")), 2)
+        rate_usd["rate"] = usd
+        rate_eur = dict()
+        rate_eur["currency"] = "EUR"
+        eur = round(float((result.get("data")).get("EURRUB")), 2)
+        rate_eur["rate"] = eur
+        rate_list = []
+        rate_list.append(rate_usd)
+        rate_list.append(rate_eur)
+        return rate_list
+    else:
+        return f"Ошибка: статус_код {status_code}"
 
 
 # if __name__ == '__main__':
@@ -305,7 +329,7 @@ def show_stock_prices_data_sp500(file: str = USERS_SETTINGS) -> list[dict] | str
                     # Создаем пустой словарь и добавляем в него данные
                     price_dict = dict()
                     price_dict["stock"] = ticker
-                    price_dict["price"] = round(float(result.get("05. price")), 2)
+                    price_dict["rate"] = round(float(result.get("05. price")), 2)
                     # Добавляем словарь в список
                     prices.append(price_dict)
                 # Сообщение о том, что API запросы закончились
