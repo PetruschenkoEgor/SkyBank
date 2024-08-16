@@ -23,7 +23,6 @@ def main():
                 print(f"Карта: {card.get("last_digits")}")
                 print(f"Расходы: {card.get("total_spent")}")
                 print(f"Кэшбэк: {card.get("cashback")}")
-                print()
             break
         elif info_card == "нет":
             break

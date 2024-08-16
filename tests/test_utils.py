@@ -5,12 +5,15 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from src.utils import (get_data_from_excel, get_data_from_excel_df, get_total_amount_expenses,
-                       mask_card_number, say_hello, show_cashback, show_transactions_top_5)
+from src.utils import (get_data_from_excel, get_data_from_excel_df, get_total_amount_expenses, mask_card_number,
+                       say_hello, show_cashback, show_currency_rates_data, show_stock_prices_data_sp500,
+                       show_transactions_top_5)
 
 PATH_TO_FILE_EMPTY = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "emptyr.xlsx")
 PATH_TO_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "df_1.xlsx")
 PATH_USERS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "users_settings.json")
+# Файл с пользовательскими настройками
+USERS_SETTINGS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "users_settings1.json")
 
 
 @patch("src.utils.datetime.datetime")
@@ -163,3 +166,26 @@ def test_get_data_from_excel_read(mock_pd):
             "Сумма операции с округлением": 176.0,
         }
     ]
+
+
+@patch("src.utils.requests.get")
+def tests_show_currency_rates_data(mock_get):
+    """ Тестирование get-запроса с курсом валют """
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.json.return_value = {'status': 200, 'message': 'rates', 'data': {'USDRUB': '64.1824',
+                                                                                           'EURRUB': '69.244'}}
+    assert show_currency_rates_data() == [{'currency': 'USD', 'rate': 64.18}, {'currency': 'EUR', 'rate': 69.24}]
+
+
+@patch("src.utils.requests.get")
+def tests_show_stock_prices_data_sp500(mock_get_):
+    """ Тестирование get-запроса с курсом акций """
+    mock_get_.return_value.status_code = 200
+    mock_get_.return_value.json.return_value = {'Global Quote': {'01. symbol': 'TSLA', '02. open': '205.0200',
+                                                                 '03. high': '215.8800', '04. low': '204.8200',
+                                                                 '05. price': '214.1400', '06. volume': '89848530',
+                                                                 '07. latest trading day': '2024-08-15',
+                                                                 '08. previous close': '201.3800',
+                                                                 '09. change': '12.7600', '10. change percent':
+                                                                     '6.3363%'}}
+    assert show_stock_prices_data_sp500(USERS_SETTINGS) == [{'stock': 'TSLA', 'rate': 214.14}]

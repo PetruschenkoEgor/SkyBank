@@ -347,5 +347,5 @@ def show_stock_prices_data_sp500(file: str = USERS_SETTINGS) -> list[dict] | str
         return f"Ошибка: {e}"
 
 
-# if __name__ == '__main__':
-#     print(show_stock_prices_data_sp500())
+if __name__ == '__main__':
+    print(show_stock_prices_data_sp500())
