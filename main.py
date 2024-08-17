@@ -10,7 +10,7 @@ from src.views import get_data_for_web_page
 def main():
     """Главная функция"""
     # Главная функция раздела Главная страница
-    views_main = json.loads(get_data_for_web_page())
+    views_main = json.loads(get_data_for_web_page(get_data_from_excel_df(PATH_TO_FILE_EXCEL)))
 
     print(say_hello())
 

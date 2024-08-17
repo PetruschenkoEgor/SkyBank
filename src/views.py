@@ -1,11 +1,13 @@
 import json
 
+import pandas as pd
+
 from src.utils import (PATH_TO_FILE_EXCEL, TODAY, USERS_SETTINGS, get_data_from_excel, get_data_from_excel_df,
                        get_total_amount_expenses, mask_card_number, say_hello, show_currency_rates_data,
                        show_stock_prices_data_sp500, show_transactions_top_5)
 
 
-def get_data_for_web_page(date: str = TODAY) -> str:
+def get_data_for_web_page(data: pd.DataFrame, date: str = TODAY) -> str:
     """ " Главная функция раздела веб_страниц"""
     # Создаем пустой словарь для добавления данных для раздела веб-страницы
     data_web_page = dict()
@@ -16,8 +18,8 @@ def get_data_for_web_page(date: str = TODAY) -> str:
 
     # Общая сумма расходов по каждой карте
     cards = get_total_amount_expenses(
-        get_data_from_excel_df(PATH_TO_FILE_EXCEL),
-        mask_card_number(get_data_from_excel_df(PATH_TO_FILE_EXCEL)),
+        data,
+        mask_card_number(data),
         date=TODAY,
     )
     data_web_page["cards"] = cards
@@ -38,4 +40,4 @@ def get_data_for_web_page(date: str = TODAY) -> str:
 
 
 if __name__ == "__main__":
-    print(get_data_for_web_page())
+    print(get_data_for_web_page(get_data_from_excel_df(PATH_TO_FILE_EXCEL)))
