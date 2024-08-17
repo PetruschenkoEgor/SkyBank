@@ -41,7 +41,7 @@ def main():
                     f"Сумма: {top.get("amount")}\n"
                     f"Категория: {top.get("category")}\n"
                     f"Информация: {top.get("description")}"
-                )
+                    )
             break
         elif top_5 == "нет":
             break
